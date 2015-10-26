@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"os"
+	"strings"
 )
 
 // The contents of this file are heavily based on
@@ -54,6 +55,7 @@ func getApiKeyFile() (apikey string, err error) {
 
 		bufrd := bufio.NewReader(file)
 		apikey, ferr = bufrd.ReadString('\n')
+		apikey = strings.TrimSpace(apikey)
 
 		if ferr != nil {
 			apikey = ""
