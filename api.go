@@ -37,7 +37,6 @@ func (s *Session) apiRequest(endpoint string, mixins []string) (*json.RawMessage
 	}
 	theurl.Path += endpoint
 	theurl.RawQuery = params.Encode()
-	fmt.Println("Getting URL: " + theurl.String())
 	req, err := http.NewRequest("GET", theurl.String(), nil)
 	if err != nil {
 		return nil, err
