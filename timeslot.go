@@ -21,7 +21,7 @@ type Show struct {
 }
 
 func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
-	data, err := s.apiRequest("/timeslot/currentandnext", []string)
+	data, err := s.apiRequest("/timeslot/currentandnext", []string{})
 	if err != nil {
 		return nil, err
 	}
