@@ -1,8 +1,8 @@
 package myradio
 
 import (
-	"bufio"
 	"errors"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -45,17 +45,16 @@ func getApiKeyEnv() (apikey string, err error) {
 }
 
 func getApiKeyFile() (apikey string, err error) {
-	for _, rawPath := range KeyFiles {
-		path := os.ExpandEnv(rawPath)
-		file, ferr := os.Open(path)
-		if ferr != nil {
-			apikey = ""
-			continue
-		}
 
-		bufrd := bufio.NewReader(file)
-		apikey, ferr = bufrd.ReadString('\n')
-		apikey = strings.TrimSpace(apikey)
+	for _, rawPath := range KeyFiles {
+
+		path := os.ExpandEnv(rawPath)
+
+		b, ferr := ioutil.ReadFile(path)
+
+		s := string(b)
+
+		apikey = strings.TrimSpace(s)
 
 		if ferr != nil {
 			apikey = ""
@@ -68,6 +67,7 @@ func getApiKeyFile() (apikey string, err error) {
 	if apikey == "" {
 		err = ErrNoKeyFile
 	}
+
 	return
 }
 
