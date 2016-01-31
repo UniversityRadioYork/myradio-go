@@ -45,30 +45,28 @@ func getApiKeyEnv() (apikey string, err error) {
 }
 
 func getApiKeyFile() (apikey string, err error) {
-
 	for _, rawPath := range KeyFiles {
-
-		path := os.ExpandEnv(rawPath)
-
-		b, ferr := ioutil.ReadFile(path)
-
-		s := string(b)
-
-		apikey = strings.TrimSpace(s)
-
-		if ferr != nil {
-			apikey = ""
-			continue
+		apikey = getApiKeyFromFile(rawPath)
+		if apikey != "" {
+			return
 		}
-
-		return
 	}
-
 	if apikey == "" {
 		err = ErrNoKeyFile
 	}
-
 	return
+}
+
+// getApiKeyFromFile tries to get an apikey from a file.
+// Returns an empty string if it fails
+func getApiKeyFromFile(path string) (string) {
+	path = os.ExpandEnv(path)
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		return ""
+	}
+	s := string(b)
+	return strings.TrimSpace(s)
 }
 
 // NewSessionFromKeyFile tries to open a Session with the key from an API key file.
