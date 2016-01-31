@@ -6,7 +6,7 @@ import (
 	"net/url"
 )
 
-type Show struct {
+type ShowMeta struct {
 	ShowID        int    `json:"show_id"`
 	Title         string `json:"title"`
 	Credits       string `json:"credits"`
@@ -26,7 +26,7 @@ type Link struct {
 	URL     string      `json:"url"`
 }
 
-func (s *Session) GetSearchMeta(term string) (*[]Show, error) {
+func (s *Session) GetSearchMeta(term string) (*[]ShowMeta, error) {
 
 	q := url.QueryEscape(term)
 
@@ -36,7 +36,7 @@ func (s *Session) GetSearchMeta(term string) (*[]Show, error) {
 		return nil, err
 	}
 
-	var shows []Show
+	var shows []ShowMeta
 
 	err = json.Unmarshal(*data, &shows)
 
