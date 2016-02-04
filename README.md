@@ -18,6 +18,5 @@ lists := session.GetAllLists()
 ## Testing
 
 ```bash
-$ go build # make sure your build is up to date
 $ go test
 ```
