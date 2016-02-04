@@ -4,32 +4,19 @@ import (
 	"testing"
 )
 
-func TestGetApiKeyFromFileWorks(t *testing.T){
+func TestGetApiKeyFromFile(t *testing.T) {
 
-	k := getApiKeyFromFile("testdata/.myradio.key")
-
-	if k != "THIS-IS-A-TEST-KEY-THAT-WILL-NOT-WORK" {
-		t.Fail()
+	var tests = []struct{Path, Expected string}{
+		{"testdata/.myradio.key", "THIS-IS-A-TEST-KEY-THAT-WILL-NOT-WORK"},
+		{"testdata/.linebreaks.key", "THIS-KEY-HAS-SOME-LINE-BREAKS"},
+		{"testdata/.shouldntexist.key", ""},
 	}
 
-}
-
-func TestGetApiKeyFromFileWorksWithLineBreaks(t *testing.T) {
-
-	k := getApiKeyFromFile("testdata/.linebreaks.key")
-
-	if k != "THIS-KEY-HAS-SOME-LINE-BREAKS" {
-		t.Fail()
-	}
-
-}
-
-func TestGetApiKeyFromFileReturnsEmptyString(t *testing.T) {
-
-	k := getApiKeyFromFile("testdata/.shouldntexist.key")
-
-	if k != "" {
-		t.Fail()
+	for _, test := range tests {
+		k := getApiKeyFromFile(test.Path)
+		if k != test.Expected {
+			t.Fail()
+		}
 	}
 
 }
