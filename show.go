@@ -47,3 +47,23 @@ func (s *Session) GetSearchMeta(term string) (*[]ShowMeta, error) {
 	return &shows, nil
 
 }
+
+func (s *Session) GetShow(id int) (*ShowMeta, error) {
+
+	data, err := s.apiRequest(fmt.Sprintf("/show/%d", id), []string{})
+
+	if err != nil {
+		return nil, err
+	}
+
+	var show ShowMeta
+
+	err = json.Unmarshal(*data, &show)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &show, nil
+
+}
