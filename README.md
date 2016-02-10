@@ -13,3 +13,10 @@ session, _ := myradio.NewSession("your_api_key")
 
 lists := session.GetAllLists()
 ```
+
+
+## Testing
+
+```bash
+$ go test
+```
