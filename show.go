@@ -5,19 +5,27 @@ import (
 	"fmt"
 	"net/url"
 	"time"
+	"log"
 )
 
+type Credit struct {
+	Type     int    `json:"type"`
+	MemberID int    `json:"memberid"`
+	User     Member `json:"User"`
+}
+
 type ShowMeta struct {
-	ShowID        int    `json:"show_id"`
-	Title         string `json:"title"`
-	Credits       string `json:"credits"`
-	Description   string `json:"description"`
-	ShowTypeID    int    `json:"show_type_id"`
-	Season        Link   `json:"seasons"`
-	EditLink      Link   `json:"editlink"`
-	ApplyLink     Link   `json:"applylink"`
-	MicroSiteLink Link   `json:"micrositelink"`
-	Photo         string `json:"photo"`
+	ShowID        int      `json:"show_id"`
+	Title         string   `json:"title"`
+	CreditsString string   `json:"credits_string"`
+	Credits       []Credit `json:"credits"`
+	Description   string   `json:"description"`
+	ShowTypeID    int      `json:"show_type_id"`
+	Season        Link     `json:"seasons"`
+	EditLink      Link     `json:"editlink"`
+	ApplyLink     Link     `json:"applylink"`
+	MicroSiteLink Link     `json:"micrositelink"`
+	Photo         string   `json:"photo"`
 }
 
 type Link struct {
@@ -28,21 +36,14 @@ type Link struct {
 }
 
 type Season struct {
-	ShowID        int    `json:"show_id"`
-	Title         string `json:"title"`
-	Credits       string `json:"credits"`
-	Description   string `json:"description"`
-	ShowTypeID    int    `json:"show_type_id"`
-	Season        Link   `json:"seasons"`
-	EditLink      Link   `json:"editlink"`
-	ApplyLink     Link   `json:"applylink"`
-	MicroSiteLink Link   `json:"micrositelink"`
-	Photo         string `json:"photo"`
+	ShowMeta
 	SeasonID      int    `json:"season_id"`
 	SeasonNum     int    `json:"season_num"`
-	Submitted     time.Time   `json:"submitted"`
+	SubmittedRaw  string   `json:"submitted"`
+	Submitted     time.Time
 	RequestedTime string      `json:"requested_time"`
-	FirstTime     time.Time   `json:"first_time"`
+	FirstTimeRaw  string      `json:"first_time"`
+	FirstTime     time.Time
 	NumEpisodes   Link        `json:"num_episodes"`
 	AllocateLink  Link        `json:"allocatelink"`
 	RejectLink    Link        `json:"rejectlink"`
@@ -90,7 +91,7 @@ func (s *Session) GetShow(id int) (*ShowMeta, error) {
 
 }
 
-func (s *Session) GetSeasons(id int) (*[]Season, error) {
+func (s *Session) GetSeasons(id int) ([]Season, error) {
 
 	data, err := s.apiRequest(fmt.Sprintf("/show/%d/allseasons", id), []string{})
 
@@ -106,6 +107,22 @@ func (s *Session) GetSeasons(id int) (*[]Season, error) {
 		return nil, err
 	}
 
-	return &seasons, nil
+	for _, v := range seasons {
+
+		v.FirstTime, err = time.Parse("02/01/2006 15:04", v.FirstTimeRaw)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		v.Submitted, err = time.Parse("02/01/2006 15:04", v.SubmittedRaw)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	}
+
+	return seasons, nil
 
 }
