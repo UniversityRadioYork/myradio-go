@@ -14,6 +14,7 @@ type Credit struct {
 	User     Member `json:"User"`
 }
 
+// @TODO: Refactor this to something better named
 type ShowMeta struct {
 	ShowID        int      `json:"show_id"`
 	Title         string   `json:"title"`
