@@ -50,7 +50,7 @@ type Season struct {
 	RejectLink    Link        `json:"rejectlink"`
 }
 
-func (s *Session) GetSearchMeta(term string) (*[]ShowMeta, error) {
+func (s *Session) GetSearchMeta(term string) ([]ShowMeta, error) {
 
 	q := url.QueryEscape(term)
 
@@ -68,7 +68,7 @@ func (s *Session) GetSearchMeta(term string) (*[]ShowMeta, error) {
 		return nil, err
 	}
 
-	return &shows, nil
+	return shows, nil
 
 }
 
