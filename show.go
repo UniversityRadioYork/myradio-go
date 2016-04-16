@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/url"
 	"time"
-	"log"
 )
 
 type Credit struct {
@@ -113,13 +112,13 @@ func (s *Session) GetSeasons(id int) ([]Season, error) {
 		seasons[k].FirstTime, err = time.Parse("02/01/2006 15:04", v.FirstTimeRaw)
 
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 
 		seasons[k].Submitted, err = time.Parse("02/01/2006 15:04", v.SubmittedRaw)
 
 		if err != nil {
-			log.Fatal(err)
+			return nil, err
 		}
 
 	}
