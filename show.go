@@ -39,14 +39,14 @@ type Season struct {
 	ShowMeta
 	SeasonID      int    `json:"season_id"`
 	SeasonNum     int    `json:"season_num"`
-	SubmittedRaw  string   `json:"submitted"`
+	SubmittedRaw  string `json:"submitted"`
 	Submitted     time.Time
-	RequestedTime string      `json:"requested_time"`
-	FirstTimeRaw  string      `json:"first_time"`
+	RequestedTime string `json:"requested_time"`
+	FirstTimeRaw  string `json:"first_time"`
 	FirstTime     time.Time
-	NumEpisodes   Link        `json:"num_episodes"`
-	AllocateLink  Link        `json:"allocatelink"`
-	RejectLink    Link        `json:"rejectlink"`
+	NumEpisodes   Link `json:"num_episodes"`
+	AllocateLink  Link `json:"allocatelink"`
+	RejectLink    Link `json:"rejectlink"`
 }
 
 func (s *Session) GetSearchMeta(term string) ([]ShowMeta, error) {

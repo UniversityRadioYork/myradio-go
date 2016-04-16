@@ -6,7 +6,7 @@ import (
 
 func TestGetApiKeyFromFile(t *testing.T) {
 
-	var tests = []struct{Path, Expected string}{
+	var tests = []struct{ Path, Expected string }{
 		{"testdata/.myradio.key", "THIS-IS-A-TEST-KEY-THAT-WILL-NOT-WORK"},
 		{"testdata/.linebreaks.key", "THIS-KEY-HAS-SOME-LINE-BREAKS"},
 		{"testdata/.shouldntexist.key", ""},

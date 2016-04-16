@@ -59,7 +59,7 @@ func getApiKeyFile() (apikey string, err error) {
 
 // getApiKeyFromFile tries to get an apikey from a file.
 // Returns an empty string if it fails
-func getApiKeyFromFile(path string) (string) {
+func getApiKeyFromFile(path string) string {
 	path = os.ExpandEnv(path)
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
