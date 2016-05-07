@@ -38,6 +38,18 @@ type Timeslot struct {
 	MixcloudStatus string `json:"mixcloud_status"`
 }
 
+type TracklistItem struct {
+	Track
+	Album        Album `json:"album"`
+	EditLink     Link  `json:"editlink"`
+	DeleteLink   Link  `json:"deletelink"`
+	Time         time.Time
+	TimeRaw      int64 `json:"time"`
+	StartTime    time.Time
+	StartTimeRaw string `json:"starttime"`
+	AudioLogID   uint   `json:"audiologid"`
+}
+
 func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 	data, err := s.apiRequest("/timeslot/currentandnext", []string{})
 	if err != nil {
@@ -77,6 +89,22 @@ func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
 	timeslot.Duration, err = parseDuration("15:04:05", timeslot.DurationRaw)
 	if err != nil {
 		return
+	}
+	return
+}
+
+func (s *Session) GetTrackListForTimeslot(id int) (tracklist []TracklistItem, err error) {
+	data, err := s.apiRequest(fmt.Sprintf("/tracklistItem/tracklistfortimeslot/%d", id), []string{})
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(*data, &tracklist)
+	for k, v := range tracklist {
+		tracklist[k].Time = time.Unix(tracklist[k].TimeRaw, 0)
+		tracklist[k].StartTime, err = time.Parse("02/01/2006 15:04:05", v.StartTimeRaw)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return
 }
