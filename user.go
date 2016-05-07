@@ -2,6 +2,7 @@ package myradio
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -25,84 +26,76 @@ type Photo struct {
 	Url          string `json:"url"`
 }
 
-func (s *Session) GetUserBio(id int) (string, error) {
+func (s *Session) GetUserBio(id int) (bio string, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d/bio/", id), []string{})
 	if err != nil {
-		return "", err
+		return
 	}
-	var bio string
+	if data == nil {
+		err = errors.New("No bio set")
+		return
+	}
 	err = json.Unmarshal(*data, &bio)
-	if err != nil {
-		return "", err
-	}
-	return bio, nil
+	return
 }
 
-func (s *Session) GetUserName(id int) (string, error) {
+func (s *Session) GetUserName(id int) (name string, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d/name/", id), []string{})
 	if err != nil {
-		return "", err
+		return
 	}
-	var name string
 	err = json.Unmarshal(*data, &name)
-	if err != nil {
-		return "", err
-	}
-	return name, nil
+	return
 }
 
 func (s *Session) GetUserProfilePhoto(id int) (profilephoto Photo, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d/profilephoto/", id), []string{})
 	if err != nil {
-		return profilephoto, err
+		return
+	}
+	if data == nil {
+		err = errors.New("No profile picture set")
+		return
 	}
 	err = json.Unmarshal(*data, &profilephoto)
 	if err != nil {
-		return profilephoto, err
+		return
 	}
 	profilephoto.DateAdded, err = time.Parse("02/01/2006 15:04", profilephoto.DateAddedRaw)
-	if err != nil {
-		return profilephoto, err
-	}
-	return profilephoto, nil
+	return
 }
 
-func (s *Session) GetUserOfficerships(id int) ([]Officership, error) {
+func (s *Session) GetUserOfficerships(id int) (officerships []Officership, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d/officerships/", id), []string{})
 	if err != nil {
-		return nil, err
+		return
 	}
-	var officerships []Officership
 	err = json.Unmarshal(*data, &officerships)
 	if err != nil {
-		return nil, err
+		return
 	}
 	for k, v := range officerships {
 		if officerships[k].FromDateRaw != "" {
 			officerships[k].FromDate, err = time.Parse("2006-01-02", v.FromDateRaw)
 			if err != nil {
-				return nil, err
+				return
 			}
 		}
 		if officerships[k].TillDateRaw != "" {
 			officerships[k].TillDate, err = time.Parse("2006-01-02", v.FromDateRaw)
 			if err != nil {
-				return nil, err
+				return
 			}
 		}
 	}
-	return officerships, nil
+	return
 }
 
-func (s *Session) GetUserShowCredits(id int) ([]ShowMeta, error) {
+func (s *Session) GetUserShowCredits(id int) (shows []ShowMeta, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d/shows/", id), []string{})
 	if err != nil {
-		return nil, err
+		return
 	}
-	var shows []ShowMeta
 	err = json.Unmarshal(*data, &shows)
-	if err != nil {
-		return nil, err
-	}
-	return shows, nil
+	return
 }
