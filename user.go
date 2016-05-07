@@ -93,3 +93,16 @@ func (s *Session) GetUserOfficerships(id int) ([]Officership, error) {
 	}
 	return officerships, nil
 }
+
+func (s *Session) GetUserShowCredits(id int) ([]ShowMeta, error) {
+	data, err := s.apiRequest(fmt.Sprintf("/user/%d/shows/", id), []string{})
+	if err != nil {
+		return nil, err
+	}
+	var shows []ShowMeta
+	err = json.Unmarshal(*data, &shows)
+	if err != nil {
+		return nil, err
+	}
+	return shows, nil
+}
