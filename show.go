@@ -3,9 +3,9 @@ package myradio
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/url"
 	"time"
-	"log"
 )
 
 type Credit struct {
