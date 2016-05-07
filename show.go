@@ -3,7 +3,6 @@ package myradio
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/url"
 	"time"
 )
@@ -92,38 +91,24 @@ func (s *Session) GetShow(id int) (*ShowMeta, error) {
 
 }
 
-func (s *Session) GetSeasons(id int) ([]Season, error) {
-
+func (s *Session) GetSeasons(id int) (seasons []Season, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/show/%d/allseasons", id), []string{})
-
 	if err != nil {
-		return nil, err
+		return
 	}
-
-	var seasons []Season
-
 	err = json.Unmarshal(*data, &seasons)
-
 	if err != nil {
-		return nil, err
+		return
 	}
-
 	for k, v := range seasons {
-
 		seasons[k].FirstTime, err = time.Parse("02/01/2006 15:04", v.FirstTimeRaw)
-
 		if err != nil {
-			log.Print(err)
+			return
 		}
-
 		seasons[k].Submitted, err = time.Parse("02/01/2006 15:04", v.SubmittedRaw)
-
 		if err != nil {
-			log.Print(err)
+			return
 		}
-
 	}
-
-	return seasons, nil
-
+	return
 }
