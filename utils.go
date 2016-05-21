@@ -3,7 +3,6 @@ package myradio
 import (
 	"errors"
 	"fmt"
-	"strconv"
 	"time"
 )
 
@@ -70,17 +69,17 @@ func padDayWithJukebox(day Day, from time.Time, to time.Time, jbSeason Season) (
 }
 
 // First day must be schedule["1"]
-func GetScheduleDayLimits(schedule Schedule) (startTimes map[string]time.Time, endTimes map[string]time.Time, err error) {
+func GetScheduleDayLimits(schedule Schedule) (startTimes []time.Time, endTimes []time.Time, err error) {
 	if len(schedule) == 0 {
 		err = errors.New("schedule invalid")
 	}
 	// Initial value
-	day := schedule["1"]
+	day := schedule[0]
 	startOffset := day[0].StartTime.Sub(midnight(day[0].StartTime))
 	endOffset := day[len(day)-1].EndTime().Sub(midnight(day[len(day)-1].StartTime))
 	// Find the extremities of times within the schedule
-	for i := 1; i <= len(schedule); i++ {
-		day = schedule[strconv.Itoa(i)]
+	for i := 0; i < len(schedule); i++ {
+		day = schedule[i]
 		st := day[0].StartTime
 		mid := midnight(st)
 		et := day[len(day)-1].EndTime()
@@ -95,14 +94,13 @@ func GetScheduleDayLimits(schedule Schedule) (startTimes map[string]time.Time, e
 		}
 	}
 	// Generate times for output
-	startTimes = make(map[string]time.Time)
-	endTimes = make(map[string]time.Time)
-	for i := 1; i <= len(schedule); i++ {
-		dayStr := strconv.Itoa(i)
-		day = schedule[dayStr]
+	startTimes = make([]time.Time, len(schedule))
+	endTimes = make([]time.Time, len(schedule))
+	for i := 0; i < len(schedule); i++ {
+		day = schedule[i]
 		mid := midnight(day[0].StartTime)
-		startTimes[dayStr] = mid.Add(startOffset)
-		endTimes[dayStr] = mid.Add(endOffset)
+		startTimes[i] = mid.Add(startOffset)
+		endTimes[i] = mid.Add(endOffset)
 
 	}
 	return

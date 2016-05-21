@@ -51,7 +51,7 @@ type TracklistItem struct {
 	AudioLogID   uint   `json:"audiologid"`
 }
 
-type Schedule map[string][]Timeslot
+type Schedule [][]Timeslot
 
 type Day []Timeslot
 
