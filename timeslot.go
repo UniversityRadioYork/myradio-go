@@ -51,6 +51,10 @@ type TracklistItem struct {
 	AudioLogID   uint   `json:"audiologid"`
 }
 
+type Schedule map[string][]Timeslot
+
+type Day []Timeslot
+
 func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 	data, err := s.apiRequest("/timeslot/currentandnext", []string{})
 	if err != nil {

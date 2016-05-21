@@ -24,7 +24,7 @@ func parseDuration(layout, value string) (dur time.Duration, err error) {
 }
 
 // Return a schedule
-func (s *Session) PadWithJukebox(schedule map[string][]Timeslot) (err error) {
+func (s *Session) PadWithJukebox(schedule Schedule) (err error) {
 	jbShow, err := s.GetShow(1)
 	if err != nil {
 		return
@@ -48,7 +48,7 @@ func (s *Session) PadWithJukebox(schedule map[string][]Timeslot) (err error) {
 }
 
 // Return a day padded with jukebox Timeslots, with start and end limits (full date and time requried)
-func padDayWithJukebox(day []Timeslot, from time.Time, to time.Time, jbSeason Season) (retday []Timeslot, err error) {
+func padDayWithJukebox(day Day, from time.Time, to time.Time, jbSeason Season) (retday Day, err error) {
 	for i := 0; i < len(day); i++ {
 		d := day[i].StartTime.Sub(from)
 		if d < 0 {
@@ -70,7 +70,7 @@ func padDayWithJukebox(day []Timeslot, from time.Time, to time.Time, jbSeason Se
 }
 
 // First day must be schedule["1"]
-func GetScheduleDayLimits(schedule map[string][]Timeslot) (startTimes map[string]time.Time, endTimes map[string]time.Time, err error) {
+func GetScheduleDayLimits(schedule Schedule) (startTimes map[string]time.Time, endTimes map[string]time.Time, err error) {
 	if len(schedule) == 0 {
 		err = errors.New("schedule invalid")
 	}
