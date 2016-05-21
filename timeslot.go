@@ -149,3 +149,7 @@ func (s *Session) GetTrackListForTimeslot(id int) (tracklist []TracklistItem, er
 	}
 	return
 }
+
+func (t *Timeslot) EndTime() time.Time {
+	return t.StartTime.Add(t.Duration)
+}
