@@ -26,6 +26,11 @@ type Photo struct {
 	Url          string `json:"url"`
 }
 
+type UserAlias struct {
+	Source      string
+	Destination string
+}
+
 func (s *Session) GetUserBio(id int) (bio string, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d/bio/", id), []string{})
 	if err != nil {
@@ -98,4 +103,22 @@ func (s *Session) GetUserShowCredits(id int) (shows []ShowMeta, err error) {
 	}
 	err = json.Unmarshal(*data, &shows)
 	return
+}
+
+func (s *Session) GetUserAliases() ([]UserAlias, error) {
+	data, err := s.apiRequest("/user/allaliases/", []string{})
+	if err != nil {
+		return nil, err
+	}
+	raw := [][]string{}
+	err = json.Unmarshal(*data, &raw)
+	if err != nil {
+		return nil, err
+	}
+	var aliases = make([]UserAlias, len(raw))
+	for k, v := range raw {
+		aliases[k].Source = v[0]
+		aliases[k].Destination = v[1]
+	}
+	return aliases, nil
 }
