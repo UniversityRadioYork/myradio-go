@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 type Session struct {
@@ -33,7 +34,7 @@ func (s *Session) apiRequest(endpoint string, mixins []string) (*json.RawMessage
 	theurl := s.baseurl
 	params := url.Values{
 		"api_key": []string{s.apikey},
-		"mixins":  mixins,
+		"mixins":  []string{strings.Join(mixins, ",")},
 	}
 	theurl.Path += endpoint
 	theurl.RawQuery = params.Encode()

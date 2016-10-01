@@ -5,16 +5,16 @@ import (
 )
 
 type Alias struct {
-	id           int `json:"alias_id"`
-	source       string
-	destinations []struct {
-		atype string `json:"type"`
-		value *json.RawMessage
+	Id           int `json:"alias_id"`
+	Source       string
+	Destinations []struct {
+		Atype string `json:"type"`
+		Value *json.RawMessage
 	}
 }
 
-func (s *Session) GetAllAliases() ([]Alias, error) {
-	data, err := s.apiRequest("/alias/allaliases", nil)
+func (s *Session) GetAllAliases(mixins []string) ([]Alias, error) {
+	data, err := s.apiRequest("/alias/allaliases", mixins)
 	if err != nil {
 		return nil, err
 	}
