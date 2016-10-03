@@ -3,6 +3,7 @@ package myradio
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -65,6 +66,46 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 	currentAndNext.Next.StartTime = time.Unix(currentAndNext.Next.StartTimeRaw, 0)
 	currentAndNext.Next.EndTime = time.Unix(currentAndNext.Next.EndTimeRaw, 0)
 	return &currentAndNext, nil
+}
+
+func (s *Session) GetWeekSchedule(year, week int) (map[time.Weekday][]Timeslot, error) {
+	// TODO(CaptainHayashi): proper errors
+	if year < 0 {
+		return nil, fmt.Errorf("year %d is too low", year)
+	}
+	if week < 1 || 53 < week {
+		return nil, fmt.Errorf("week %d is not within the ISO range 1..53", week)
+	}
+
+	data, err := s.apiRequestWithParams(fmt.Sprintf("/timeslot/weekschedule/%d", week), []string{}, map[string][]string{"year": {strconv.Itoa(year)}})
+	if err != nil {
+		return nil, err
+	}
+
+	// The timeslots come to us with string keys labelled with the weekday, starting from 1.
+	stringyTimeslots := make(map[string][]Timeslot)
+	err = json.Unmarshal(*data, &stringyTimeslots)
+	if err != nil {
+		return nil, err
+	}
+
+	timeslots := make(map[time.Weekday][]Timeslot)
+	for sd, ts := range stringyTimeslots {
+		id, err := strconv.Atoi(sd)
+		if err != nil {
+			return nil, err
+		}
+
+		// MyRadio starts labelling with Monday = 1 (Sunday = 7).
+		// Go starts with Sunday = 0.
+		// We can easily correct this by handling only Sunday specially.
+		if id == 7 {
+			id = 0
+		}
+		timeslots[time.Weekday(id)] = ts
+	}
+
+	return timeslots, nil
 }
 
 func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
