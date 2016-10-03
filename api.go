@@ -70,7 +70,7 @@ func (s *Session) apiRequestWithParams(endpoint string, mixins []string, params 
 	return resJson.Payload, nil
 }
 
-// apiRequest performs a GET request without custom params.
+// apiRequest conducts a GET request without custom parameters.
 func (s *Session) apiRequest(endpoint string, mixins []string) (*json.RawMessage, error) {
 	return s.apiRequestWithParams(endpoint, mixins, map[string][]string{})
 }
