@@ -30,7 +30,7 @@ type apiResponse struct {
 	Payload *json.RawMessage
 }
 
-/// apiRequestWithParams conducts a GET request with custom parameters.
+// apiRequestWithParams conducts a GET request with custom parameters.
 func (s *Session) apiRequestWithParams(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error) {
 	urlParams := url.Values{
 		"api_key": []string{s.apikey},
@@ -70,7 +70,7 @@ func (s *Session) apiRequestWithParams(endpoint string, mixins []string, params 
 	return resJson.Payload, nil
 }
 
-/// apiRequest performs a GET request without custom params.
+// apiRequest performs a GET request without custom params.
 func (s *Session) apiRequest(endpoint string, mixins []string) (*json.RawMessage, error) {
 	return s.apiRequestWithParams(endpoint, mixins, map[string][]string{})
 }

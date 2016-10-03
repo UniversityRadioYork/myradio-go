@@ -68,6 +68,8 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 	return &currentAndNext, nil
 }
 
+// GetWeekSchedule gets the weekly schedule for ISO 8601 week week of year year.
+// It returns the result as a map from weekdays to lists of timeslots for that weekday.
 func (s *Session) GetWeekSchedule(year, week int) (map[time.Weekday][]Timeslot, error) {
 	// TODO(CaptainHayashi): proper errors
 	if year < 0 {
