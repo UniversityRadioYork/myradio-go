@@ -3,6 +3,7 @@ package myradio
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -65,6 +66,46 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 	currentAndNext.Next.StartTime = time.Unix(currentAndNext.Next.StartTimeRaw, 0)
 	currentAndNext.Next.EndTime = time.Unix(currentAndNext.Next.EndTimeRaw, 0)
 	return &currentAndNext, nil
+}
+
+// GetWeekSchedule gets the weekly schedule for ISO 8601 week week of year year.
+// It returns the result as an map from ISO 8601 weekdays to timeslot slices.
+// Thus, 1 maps to Monday's timeslots; 2 to Tuesday; and so on.
+// Each slice progresses chronologically from start of URY day to finish of URY day.
+func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
+	// TODO(CaptainHayashi): proper errors
+	if year < 0 {
+		return nil, fmt.Errorf("year %d is too low", year)
+	}
+	if week < 1 || 53 < week {
+		return nil, fmt.Errorf("week %d is not within the ISO range 1..53", week)
+	}
+
+	data, err := s.apiRequestWithParams(fmt.Sprintf("/timeslot/weekschedule/%d", week), []string{}, map[string][]string{"year": {strconv.Itoa(year)}})
+	if err != nil {
+		return nil, err
+	}
+
+	// The timeslots come to us with string keys labelled with the weekday.
+	// These timeslots start from "1" (Monday) and go up to "7" (Sunday).
+	// Note that this is different from Go's view of the week (0 = Sunday, 1 = Monday)!
+	stringyTimeslots := make(map[string][]Timeslot)
+	err = json.Unmarshal(*data, &stringyTimeslots)
+	if err != nil {
+		return nil, err
+	}
+
+	// Now convert the string keys into proper indices.
+	timeslots := make(map[int][]Timeslot)
+	for sday, ts := range stringyTimeslots {
+		day, err := strconv.Atoi(sday)
+		if err != nil {
+			return nil, err
+		}
+		timeslots[day] = ts
+	}
+
+	return timeslots, nil
 }
 
 func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
