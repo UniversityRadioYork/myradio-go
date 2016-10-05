@@ -69,10 +69,10 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 }
 
 // GetWeekSchedule gets the weekly schedule for ISO 8601 week week of year year.
-// It returns the result as an array of seven timeslot slices.
-// The array starts with index 0 being Monday and end with index 6 being Sunday.
+// It returns the result as an map from ISO 8601 weekdays to timeslot slices.
+// Thus, 1 maps to Monday's timeslots; 2 to Tuesday; and so on.
 // Each slice progresses chronologically from start of URY day to finish of URY day.
-func (s *Session) GetWeekSchedule(year, week int) ([][]Timeslot, error) {
+func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 	// TODO(CaptainHayashi): proper errors
 	if year < 0 {
 		return nil, fmt.Errorf("year %d is too low", year)
@@ -96,15 +96,13 @@ func (s *Session) GetWeekSchedule(year, week int) ([][]Timeslot, error) {
 	}
 
 	// Now convert the string keys into proper indices.
-	timeslots := make([][]Timeslot, 7)
+	timeslots := make(map[int][]Timeslot)
 	for sday, ts := range stringyTimeslots {
 		day, err := strconv.Atoi(sday)
 		if err != nil {
 			return nil, err
 		}
-
-		// We use 0-based indexing.
-		timeslots[day-1] = ts
+		timeslots[day] = ts
 	}
 
 	return timeslots, nil
