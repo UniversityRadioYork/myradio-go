@@ -14,7 +14,7 @@ func TestGetApiKeyFromFile(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		k := getApiKeyFromFile(test.Path)
+		k := getAPIKeyFromFile(test.Path)
 		if k != test.Expected {
 			t.Fail()
 		}

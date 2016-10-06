@@ -62,15 +62,15 @@ func (s *Session) apiRequestWithParams(endpoint string, mixins []string, params 
 	if err != nil {
 		return nil, err
 	}
-	var resJson apiResponse
-	err = json.Unmarshal(data, &resJson)
+	var response apiResponse
+	err = json.Unmarshal(data, &response)
 	if err != nil {
 		return nil, err
 	}
-	if resJson.Status != "OK" {
-		return nil, fmt.Errorf(endpoint + fmt.Sprintf(" Response not OK: %v", resJson))
+	if response.Status != "OK" {
+		return nil, fmt.Errorf(endpoint + fmt.Sprintf(" Response not OK: %v", response))
 	}
-	return resJson.Payload, nil
+	return response.Payload, nil
 }
 
 // apiRequest conducts a GET request without custom parameters.
