@@ -9,66 +9,66 @@ import (
 // Album contains information about an album in the URY track database.
 type Album struct {
 	// ID is the unique database ID of the album.
-	ID uint64 `json:recordid`
+	ID uint64 `json:"recordid"`
 
 	// Title is the title of the track.
-	Title string `json:title`
+	Title string `json:"title"`
 	// Artist is the primary credited artist of the track.
-	Artist string `json:artist`
+	Artist string `json:"artist"`
 
 	// DateAdded is the date on which the album entered the MyRadio library.
-	DateAdded string `json:date_added`
+	DateAdded string `json:"date_added"`
 	// DateReleased is the date on which the album was released.
-	DateReleased string `json:date_released`
+	DateReleased string `json:"date_released"`
 	// LastModified is the date on which the album was last modified.
-	LastModified string `json:last_modified`
+	LastModified string `json:"last_modified"`
 
 	// CDID is the ID of the CD, if this track comes from one.
-	CDID string `json:cdid`
+	CDID string `json:"cdid"`
 
 	// Location is the location of the physical copy of this album, if any.
-	Location string `json:location`
+	Location string `json:"location"`
 	// ShelfLetter is the shelf on which the physical copy resides, if any.
-	ShelfLetter string `json:shelf_letter`
+	ShelfLetter string `json:"shelf_letter"`
 	// ShelfNumber is the position on the shelf on which the physical copy resides, if any.
-	ShelfNumber string `json:shelf_number`
+	ShelfNumber string `json:"shelf_number"`
 
 	// Format is a single-character code identifying the physical format.
-	Format string `json:format`
+	Format string `json:"format"`
 	// Medium is a single-character code identifying the physical medium.
-	Medium string `json:media`
+	Medium string `json:"media"`
 
 	// AddingMember is the ID of the member who added this album.
-	AddingMember uint64 `json:member_add`
+	AddingMember uint64 `json:"member_add"`
 	// EditingMember is the ID of the member who last modified this album.
-	EditingMember uint64 `json:member_edit`
+	EditingMember uint64 `json:"member_edit"`
 
 	// RecordLabel is the record label responsible for this album.
-	RecordLabel string `json:record_label`
+	RecordLabel string `json:"record_label"`
 
 	// Status is the digitisation status code for this album.
-	Status string `json:status`
+	Status string `json:"status"`
 }
 
 // Track contains information about a track in the URY track database.
 type Track struct {
 	// ID is the unique database ID of the track.
-	ID uint64 `json:trackid`
+	ID uint64 `json:"trackid"`
 
 	// Title is the title of the track.
-	Title string `json:title`
+	Title string `json:"title"`
 	// Artist is the primary credited artist of the track.
-	Artist string `json:artist`
+	Artist string `json:"artist"`
 	// Type is the type ('central' etc.) of the track.
-	Type string `json:type`
+	Type string `json:"type"`
 	// Length is the length of the track, in hours:minutes:seconds.
-	Length string `json:length`
+	Length string `json:"length"`
 	// Intro is length of the track's intro, in seconds.
-	Intro uint64 `json:intro`
+	Intro uint64 `json:"intro"`
 	// IsClean is true if this track is clean (no expletives).
-	IsClean bool `json:clean`
+	IsClean bool `json:"clean"`
 	// IsDigitised is true if this track is available in the playout system.
-	IsDigitised bool `json:digitised`
+	IsDigitised bool `json:"digitised"`
 }
 
 // GetAlbum tries to get the Album for the given Track.
