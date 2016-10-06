@@ -7,12 +7,16 @@ import (
 	"time"
 )
 
+// Credit represents a show credit associating a user with a show.
 type Credit struct {
 	Type     int    `json:"type"`
 	MemberID int    `json:"memberid"`
 	User     Member `json:"User"`
 }
 
+// ShowMeta represents a show in the MyRadio schedule.
+//
+// A MyRadio show contains seasons, each containing timeslots.
 // @TODO: Refactor this to something better named
 type ShowMeta struct {
 	ShowID        int      `json:"show_id"`
@@ -28,6 +32,7 @@ type ShowMeta struct {
 	Photo         string   `json:"photo"`
 }
 
+// Link represents a MyRadio action link.
 type Link struct {
 	Display string      `json:"display"`
 	Value   interface{} `json:"value"`
@@ -35,6 +40,9 @@ type Link struct {
 	URL     string      `json:"url"`
 }
 
+// Season represents a season in the MyRadio schedule.
+//
+// A MyRadio season contains timeslots.
 type Season struct {
 	ShowMeta
 	SeasonID      int    `json:"season_id"`
@@ -49,6 +57,9 @@ type Season struct {
 	RejectLink    Link `json:"rejectlink"`
 }
 
+// GetSearchMeta retrieves all shows whose metadata matches a given search term.
+//
+// This consumes one API request.
 func (s *Session) GetSearchMeta(term string) ([]ShowMeta, error) {
 
 	q := url.QueryEscape(term)
@@ -71,6 +82,9 @@ func (s *Session) GetSearchMeta(term string) ([]ShowMeta, error) {
 
 }
 
+// GetShow retrieves the show with the given ID.
+//
+// This consumes one API request.
 func (s *Session) GetShow(id int) (*ShowMeta, error) {
 
 	data, err := s.apiRequest(fmt.Sprintf("/show/%d", id), []string{})
@@ -91,6 +105,9 @@ func (s *Session) GetShow(id int) (*ShowMeta, error) {
 
 }
 
+// GetSeasons retrieves the seasons of the show with the given ID.
+//
+// This consumes one API request.
 func (s *Session) GetSeasons(id int) (seasons []Season, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/show/%d/allseasons", id), []string{})
 	if err != nil {

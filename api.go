@@ -9,11 +9,13 @@ import (
 	"strings"
 )
 
+// Session represents an open API session.
 type Session struct {
 	apikey  string
 	baseurl url.URL
 }
 
+// NewSession constructs a new Session with the given API key.
 func NewSession(apikey string) (*Session, error) {
 	url, err := url.Parse(`https://ury.york.ac.uk/api/v2`)
 	if err != nil {
@@ -25,6 +27,7 @@ func NewSession(apikey string) (*Session, error) {
 	}, nil
 }
 
+// apiResponse provides the base structure of MyRadio API responses.
 type apiResponse struct {
 	Status  string
 	Payload *json.RawMessage
