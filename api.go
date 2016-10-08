@@ -30,14 +30,21 @@ type apiResponse struct {
 	Payload *json.RawMessage
 }
 
-func (s *Session) apiRequest(endpoint string, mixins []string) (*json.RawMessage, error) {
-	theurl := s.baseurl
-	params := url.Values{
+// apiRequestWithParams conducts a GET request with custom parameters.
+func (s *Session) apiRequestWithParams(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error) {
+	urlParams := url.Values{
 		"api_key": []string{s.apikey},
 		"mixins":  []string{strings.Join(mixins, ",")},
 	}
+	for k, vs := range params {
+		for _, v := range vs {
+			urlParams.Add(k, v)
+		}
+	}
+
+	theurl := s.baseurl
 	theurl.Path += endpoint
-	theurl.RawQuery = params.Encode()
+	theurl.RawQuery = urlParams.Encode()
 	req, err := http.NewRequest("GET", theurl.String(), nil)
 	if err != nil {
 		return nil, err
@@ -61,4 +68,9 @@ func (s *Session) apiRequest(endpoint string, mixins []string) (*json.RawMessage
 		return nil, fmt.Errorf(endpoint + fmt.Sprintf(" Response not OK: %v", resJson))
 	}
 	return resJson.Payload, nil
+}
+
+// apiRequest conducts a GET request without custom parameters.
+func (s *Session) apiRequest(endpoint string, mixins []string) (*json.RawMessage, error) {
+	return s.apiRequestWithParams(endpoint, mixins, map[string][]string{})
 }
