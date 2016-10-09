@@ -5,10 +5,10 @@ import (
 )
 
 type Banner struct {
-	BannerID	int 	`json:"banner_id"`
-	Alt			string 	`json:"alt"`
-	Target		string	`json:"Target"`
-	URL 		string	`json:"url"`
+	BannerID int    `json:"banner_id"`
+	Alt      string `json:"alt"`
+	Target   string `json:"Target"`
+	URL      string `json:"url"`
 }
 
 func (s *Session) GetLiveBanners() (banners []Banner, err error) {
@@ -18,7 +18,7 @@ func (s *Session) GetLiveBanners() (banners []Banner, err error) {
 	}
 
 	err = json.Unmarshal(*data, &banners)
-	
+
 	return
 
 }
