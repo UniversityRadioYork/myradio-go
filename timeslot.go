@@ -75,7 +75,30 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 	return &currentAndNext, nil
 }
 
-// GetWeekSchedule retrieves the weekly schedule for ISO 8601 week week of year year.
+// populateTimes fills in the cooked times in a MyRadio timeslot from their raw equivalents.
+func populateTimes(timeslot *Timeslot) error {
+	var err error = nil
+	timeslot.Time = time.Unix(timeslot.TimeRaw, 0)
+	timeslot.FirstTime, err = time.Parse("02/01/2006 15:04", timeslot.FirstTimeRaw)
+	if err != nil {
+		return err
+	}
+	timeslot.Submitted, err = time.Parse("02/01/2006 15:04", timeslot.SubmittedRaw)
+	if err != nil {
+		return err
+	}
+	timeslot.StartTime, err = time.Parse("02/01/2006 15:04", timeslot.StartTimeRaw)
+	if err != nil {
+		return err
+	}
+	timeslot.Duration, err = parseDuration("15:04:05", timeslot.DurationRaw)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// GetWeekSchedule gets the weekly schedule for ISO 8601 week week of year year.
 // It returns the result as an map from ISO 8601 weekdays to timeslot slices.
 // Thus, 1 maps to Monday's timeslots; 2 to Tuesday; and so on.
 // Each slice progresses chronologically from start of URY day to finish of URY day.
@@ -110,6 +133,12 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 		if err != nil {
 			return nil, err
 		}
+		for i := range ts {
+			err = populateTimes(&ts[i])
+			if err != nil {
+				return nil, err
+			}
+		}
 		timeslots[day] = ts
 	}
 
@@ -124,20 +153,10 @@ func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
 		return
 	}
 	err = json.Unmarshal(*data, &timeslot)
-	timeslot.Time = time.Unix(timeslot.TimeRaw, 0)
-	timeslot.FirstTime, err = time.Parse("02/01/2006 15:04", timeslot.FirstTimeRaw)
 	if err != nil {
 		return
 	}
-	timeslot.Submitted, err = time.Parse("02/01/2006 15:04", timeslot.SubmittedRaw)
-	if err != nil {
-		return
-	}
-	timeslot.StartTime, err = time.Parse("02/01/2006 15:04", timeslot.StartTimeRaw)
-	if err != nil {
-		return
-	}
-	timeslot.Duration, err = parseDuration("15:04:05", timeslot.DurationRaw)
+	err = populateTimes(&timeslot)
 	if err != nil {
 		return
 	}
