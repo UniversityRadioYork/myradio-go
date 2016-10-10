@@ -68,17 +68,17 @@ func padDayWithJukebox(day Day, from time.Time, to time.Time, jbSeason Season) (
 	return
 }
 
-// First day must be schedule["1"]
+// First day must be schedule[1]
 func GetScheduleDayLimits(schedule Schedule) (startTimes []time.Time, endTimes []time.Time, err error) {
 	if len(schedule) == 0 {
 		err = errors.New("schedule invalid")
 	}
 	// Initial value
-	day := schedule[0]
+	day := schedule[1]
 	startOffset := day[0].StartTime.Sub(midnight(day[0].StartTime))
 	endOffset := day[len(day)-1].EndTime().Sub(midnight(day[len(day)-1].StartTime))
 	// Find the extremities of times within the schedule
-	for i := 0; i < len(schedule); i++ {
+	for i := 1; i < len(schedule)+1; i++ {
 		day = schedule[i]
 		st := day[0].StartTime
 		mid := midnight(st)
@@ -94,9 +94,9 @@ func GetScheduleDayLimits(schedule Schedule) (startTimes []time.Time, endTimes [
 		}
 	}
 	// Generate times for output
-	startTimes = make([]time.Time, len(schedule))
-	endTimes = make([]time.Time, len(schedule))
-	for i := 0; i < len(schedule); i++ {
+	startTimes = make([]time.Time, len(schedule)+1)
+	endTimes = make([]time.Time, len(schedule)+1)
+	for i := 1; i < len(schedule)+1; i++ {
 		day = schedule[i]
 		mid := midnight(day[0].StartTime)
 		startTimes[i] = mid.Add(startOffset)

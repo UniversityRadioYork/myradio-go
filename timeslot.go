@@ -51,7 +51,7 @@ type TracklistItem struct {
 	AudioLogID   uint   `json:"audiologid"`
 }
 
-type Schedule [][]Timeslot
+type Schedule map[int][]Timeslot
 
 type Day []Timeslot
 
@@ -116,14 +116,14 @@ func (s *Session) GetWeekSchedule(year, week int) (Schedule, error) {
 	// The timeslots come to us with string keys labelled with the weekday.
 	// These timeslots start from "1" (Monday) and go up to "7" (Sunday).
 	// Note that this is different from Go's view of the week (0 = Sunday, 1 = Monday)!
-	stringyTimeslots := make(map[string][]Timeslot)
+	stringyTimeslots := make(map[string]Day)
 	err = json.Unmarshal(*data, &stringyTimeslots)
 	if err != nil {
 		return nil, err
 	}
 
 	// Now convert the string keys into proper indices.
-	timeslots := make(Schedule, len(stringyTimeslots))
+	timeslots := make(Schedule)
 	for sday, ts := range stringyTimeslots {
 		day, err := strconv.Atoi(sday)
 		if err != nil {
@@ -135,7 +135,7 @@ func (s *Session) GetWeekSchedule(year, week int) (Schedule, error) {
 				return nil, err
 			}
 		}
-		timeslots[day - 1] = ts
+		timeslots[day] = ts
 	}
 
 	return timeslots, nil
