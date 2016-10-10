@@ -78,8 +78,7 @@ func GetScheduleDayLimits(schedule Schedule) (startTimes []time.Time, endTimes [
 	startOffset := day[0].StartTime.Sub(midnight(day[0].StartTime))
 	endOffset := day[len(day)-1].EndTime().Sub(midnight(day[len(day)-1].StartTime))
 	// Find the extremities of times within the schedule
-	for i := 1; i < len(schedule)+1; i++ {
-		day = schedule[i]
+	for _, day := range schedule {
 		st := day[0].StartTime
 		mid := midnight(st)
 		et := day[len(day)-1].EndTime()
@@ -96,11 +95,10 @@ func GetScheduleDayLimits(schedule Schedule) (startTimes []time.Time, endTimes [
 	// Generate times for output
 	startTimes = make([]time.Time, len(schedule)+1)
 	endTimes = make([]time.Time, len(schedule)+1)
-	for i := 1; i < len(schedule)+1; i++ {
-		day = schedule[i]
+	for dayNum, day := range schedule {
 		mid := midnight(day[0].StartTime)
-		startTimes[i] = mid.Add(startOffset)
-		endTimes[i] = mid.Add(endOffset)
+		startTimes[dayNum] = mid.Add(startOffset)
+		endTimes[dayNum] = mid.Add(endOffset)
 
 	}
 	return
