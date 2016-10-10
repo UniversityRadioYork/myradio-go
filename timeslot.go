@@ -79,15 +79,17 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 func populateTimes(timeslot *Timeslot) error {
 	var err error = nil
 	timeslot.Time = time.Unix(timeslot.TimeRaw, 0)
-	timeslot.FirstTime, err = time.Parse("02/01/2006 15:04", timeslot.FirstTimeRaw)
+
+	// MyRadio returns local timestamps, not UTC.
+	timeslot.FirstTime, err = time.ParseInLocation("02/01/2006 15:04", timeslot.FirstTimeRaw, time.Local)
 	if err != nil {
 		return err
 	}
-	timeslot.Submitted, err = time.Parse("02/01/2006 15:04", timeslot.SubmittedRaw)
+	timeslot.Submitted, err = time.ParseInLocation("02/01/2006 15:04", timeslot.SubmittedRaw, time.Local)
 	if err != nil {
 		return err
 	}
-	timeslot.StartTime, err = time.Parse("02/01/2006 15:04", timeslot.StartTimeRaw)
+	timeslot.StartTime, err = time.ParseInLocation("02/01/2006 15:04", timeslot.StartTimeRaw, time.Local)
 	if err != nil {
 		return err
 	}
@@ -95,6 +97,7 @@ func populateTimes(timeslot *Timeslot) error {
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
