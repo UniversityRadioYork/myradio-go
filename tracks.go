@@ -72,16 +72,13 @@ type Track struct {
 }
 
 // GetAlbum tries to get the Album for the given Track.
-//
 // This consumes one API request.
 func (t *Track) GetAlbum(s *Session) (*Album, error) {
 	return s.GetTrackAlbum(t.ID)
 }
 
 // LengthSec returns the track's length in seconds.
-//
 // Returns an error if the track's length is ill-formed.
-//
 // This consumes no API requests.
 func (t *Track) LengthSec() (uint64, error) {
 	var hours, minutes, seconds uint64
@@ -95,12 +92,9 @@ func (t *Track) LengthSec() (uint64, error) {
 }
 
 // LengthUsec returns the track's length in microseconds.
-//
 // This is not precise, as it is derived from the length in seconds.
 // Consider estimating the correct length from the track file itself.
-//
 // Returns an error if the track's length is ill-formed.
-//
 // This consumes no API requests.
 func (t *Track) LengthUsec() (uint64, error) {
 	secs, err := t.LengthSec()
@@ -112,16 +106,13 @@ func (t *Track) LengthUsec() (uint64, error) {
 }
 
 // IntroUsec returns the track's intro in microseconds.
-//
 // This consumes no API requests.
 func (t *Track) IntroUsec() uint64 {
 	return t.Intro * 1000000
 }
 
 // GetTrack tries to get the Track with the given ID.
-//
 // Track IDs are unique, so we do not need the record ID.
-//
 // This consumes one API request.
 func (s *Session) GetTrack(trackid uint64) (*Track, error) {
 	data, err := s.apiRequest(fmt.Sprintf("/track/%d", trackid), nil)
@@ -137,7 +128,6 @@ func (s *Session) GetTrack(trackid uint64) (*Track, error) {
 }
 
 // GetTrackTitle tries to get the title of the track with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetTrackTitle(trackid uint64) (string, error) {
 	data, err := s.apiRequest(fmt.Sprintf("/track/%d/title", trackid), nil)
@@ -153,7 +143,6 @@ func (s *Session) GetTrackTitle(trackid uint64) (string, error) {
 }
 
 // GetTrackAlbum tries to get the Album of the track with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetTrackAlbum(trackid uint64) (*Album, error) {
 	data, err := s.apiRequest(fmt.Sprintf("/track/%d/album", trackid), nil)

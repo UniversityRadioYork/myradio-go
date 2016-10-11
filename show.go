@@ -15,7 +15,6 @@ type Credit struct {
 }
 
 // ShowMeta represents a show in the MyRadio schedule.
-//
 // A MyRadio show contains seasons, each containing timeslots.
 // @TODO: Refactor this to something better named
 type ShowMeta struct {
@@ -41,7 +40,6 @@ type Link struct {
 }
 
 // Season represents a season in the MyRadio schedule.
-//
 // A MyRadio season contains timeslots.
 type Season struct {
 	ShowMeta
@@ -58,7 +56,6 @@ type Season struct {
 }
 
 // GetSearchMeta retrieves all shows whose metadata matches a given search term.
-//
 // This consumes one API request.
 func (s *Session) GetSearchMeta(term string) ([]ShowMeta, error) {
 
@@ -83,7 +80,6 @@ func (s *Session) GetSearchMeta(term string) ([]ShowMeta, error) {
 }
 
 // GetShow retrieves the show with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetShow(id int) (*ShowMeta, error) {
 
@@ -106,7 +102,6 @@ func (s *Session) GetShow(id int) (*ShowMeta, error) {
 }
 
 // GetSeasons retrieves the seasons of the show with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetSeasons(id int) (seasons []Season, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/show/%d/allseasons", id), []string{})

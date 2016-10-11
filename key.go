@@ -73,7 +73,6 @@ func getAPIKeyFromFile(path string) string {
 }
 
 // NewSessionFromKeyFile tries to open a Session with the key from an API key file.
-//
 // This tries the following paths for a file containing one line (the API key):
 //   1) Whichever path is set in the environment variable `MYRADIOKEYFILE`;
 //   2) `.myradio.key`, in the current directory;

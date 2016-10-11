@@ -47,7 +47,6 @@ type HeadPosition struct {
 }
 
 // GetCurrentTeams retrieves all teams inside the station committee.
-//
 // This consumes one API request.
 func (s *Session) GetCurrentTeams() (teams []Team, err error) {
 	data, err := s.apiRequest("/team/currentteams/", []string{})
@@ -62,7 +61,6 @@ func (s *Session) GetCurrentTeams() (teams []Team, err error) {
 }
 
 // GetTeamWithOfficers retrieves a team record with officer information for the given team name.
-//
 // This consumes one API request.
 func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/team/byalias/%s", teamName), []string{"officers"})
@@ -80,9 +78,7 @@ func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
 }
 
 // GetTeamHeadPositions retrieves all head-of-team positions for a given team ID.
-//
 // The amount of detail can be controlled using MyRadio mixins.
-//
 // This consumes one API request.
 func (s *Session) GetTeamHeadPositions(id int, mixins []string) (head []HeadPosition, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/team/%d/headpositions", id), mixins)

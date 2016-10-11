@@ -35,7 +35,6 @@ type UserAlias struct {
 }
 
 // GetUserBio retrieves the biography of the user with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetUserBio(id int) (bio string, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d/bio/", id), []string{})
@@ -51,7 +50,6 @@ func (s *Session) GetUserBio(id int) (bio string, err error) {
 }
 
 // GetUserName retrieves the name of the user with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetUserName(id int) (name string, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d/name/", id), []string{})
@@ -63,7 +61,6 @@ func (s *Session) GetUserName(id int) (name string, err error) {
 }
 
 // GetUserProfilePhoto retrieves the profile photo of the user with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetUserProfilePhoto(id int) (profilephoto Photo, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d/profilephoto/", id), []string{})
@@ -83,7 +80,6 @@ func (s *Session) GetUserProfilePhoto(id int) (profilephoto Photo, err error) {
 }
 
 // GetUserOfficerships retrieves all officerships held by the user with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetUserOfficerships(id int) (officerships []Officership, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d/officerships/", id), []string{})
@@ -112,7 +108,6 @@ func (s *Session) GetUserOfficerships(id int) (officerships []Officership, err e
 }
 
 // GetUserShowCredits retrieves all show credits associated with the user with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetUserShowCredits(id int) (shows []ShowMeta, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d/shows/", id), []string{})
@@ -124,7 +119,6 @@ func (s *Session) GetUserShowCredits(id int) (shows []ShowMeta, err error) {
 }
 
 // GetUserAliases retrieves all aliases associated with the user with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetUserAliases() ([]UserAlias, error) {
 	data, err := s.apiRequest("/user/allaliases/", []string{})

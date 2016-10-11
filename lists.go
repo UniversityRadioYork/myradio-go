@@ -14,7 +14,6 @@ type List struct {
 }
 
 // GetAllLists retrieves all mailing lists in the MyRadio system.
-//
 // This consumes one API request.
 func (s *Session) GetAllLists() ([]List, error) {
 	data, err := s.apiRequest("/list/alllists", nil)
@@ -30,7 +29,6 @@ func (s *Session) GetAllLists() ([]List, error) {
 }
 
 // GetMembers retrieves all members subscribed to a given mailing list.
-//
 // This consumes one API request.
 func (s *Session) GetMembers(l *List) ([]Member, error) {
 	data, err := s.apiRequest(fmt.Sprintf("/list/%d/members", l.Listid), []string{"personal_data"})

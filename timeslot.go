@@ -28,7 +28,6 @@ type Show struct {
 }
 
 // Timeslot contains information about a single timeslot in the URY schedule.
-//
 // A timeslot is a single slice of time on the schedule, typically one hour long.
 type Timeslot struct {
 	Season
@@ -58,7 +57,6 @@ type TracklistItem struct {
 }
 
 // GetCurrentAndNext gets the current and next shows at the time of the call.
-//
 // This consumes one API request.
 func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 	data, err := s.apiRequest("/timeslot/currentandnext", []string{})
@@ -78,11 +76,9 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 }
 
 // GetWeekSchedule retrieves the weekly schedule for ISO 8601 week week of year year.
-//
 // It returns the result as an map from ISO 8601 weekdays to timeslot slices.
 // Thus, 1 maps to Monday's timeslots; 2 to Tuesday; and so on.
 // Each slice progresses chronologically from start of URY day to finish of URY day.
-//
 // This consumes one API request.
 func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 	// TODO(CaptainHayashi): proper errors
@@ -121,7 +117,6 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 }
 
 // GetTimeslot retrieves the timeslot with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/timeslot/%d", id), []string{})
@@ -150,7 +145,6 @@ func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
 }
 
 // GetTrackListForTimeslot retrieves the tracklist for the timeslot with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetTrackListForTimeslot(id int) (tracklist []TracklistItem, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/tracklistItem/tracklistfortimeslot/%d", id), []string{})

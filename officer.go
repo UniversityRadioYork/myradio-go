@@ -27,9 +27,7 @@ type OfficerPosition struct {
 }
 
 // GetAllOfficerPositions retrieves all officer positions in MyRadio.
-//
 // The amount of detail can be controlled by adding MyRadio mixins.
-//
 // This consumes one API request.
 func (s *Session) GetAllOfficerPositions(mixins []string) ([]OfficerPosition, error) {
 	data, err := s.apiRequest("/officer/allofficerpositions", mixins)

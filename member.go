@@ -15,7 +15,6 @@ type Member struct {
 }
 
 // GetMember retrieves the user with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetMember(id int) (*Member, error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d", id), []string{"personal_data"})

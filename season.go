@@ -7,7 +7,6 @@ import (
 )
 
 // GetSeason retrieves the season with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetSeason(id int) (season Season, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/season/%d/", id), []string{})
@@ -27,7 +26,6 @@ func (s *Session) GetSeason(id int) (season Season, err error) {
 }
 
 // GetTimeslotsForSeason retrieves all timeslots for the season with the given ID.
-//
 // This consumes one API request.
 func (s *Session) GetTimeslotsForSeason(id int) (timeslots []Timeslot, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/season/%d/alltimeslots/", id), []string{})
