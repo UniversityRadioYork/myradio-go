@@ -53,3 +53,29 @@ func (s *Session) GetTimeslotsForSeason(id int) (timeslots []Timeslot, err error
 	}
 	return
 }
+
+func (s *Session) GetAllSeasonsInLatestTerm() (seasons []Season, err error) {
+	data, err := s.apiRequest("/season/allseasonsinlatestterm/", []string{})
+	if err != nil {
+		return
+	}
+	err = json.Unmarshal(*data, &seasons)
+	if err != nil {
+		return
+	}
+	for k, season := range seasons {
+		if season.FirstTimeRaw != "Not Scheduled" {
+			seasons[k].FirstTime, err = time.Parse("02/01/2006 15:04", season.FirstTimeRaw)
+			if err != nil {
+				return
+			}
+		}
+		if season.FirstTimeRaw != "Not Scheduled" {
+			seasons[k].Submitted, err = time.Parse("02/01/2006 15:04", season.SubmittedRaw)
+			if err != nil {
+				return
+			}
+		}
+	}
+	return
+}
