@@ -9,9 +9,9 @@ import (
 
 // Credit represents a show credit associating a user with a show.
 type Credit struct {
-	Type     int    `json:"type"`
-	MemberID int    `json:"memberid"`
-	User     Member `json:"User"`
+	Type     int  `json:"type"`
+	MemberID int  `json:"memberid"`
+	User     User `json:"User"`
 }
 
 // ShowMeta represents a show in the MyRadio schedule.

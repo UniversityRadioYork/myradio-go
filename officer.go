@@ -15,9 +15,9 @@ type OfficerPosition struct {
 	Description string
 	Status      string
 	Type        string
-	Current     []Member `json:"current,omitempty"`
+	Current     []User `json:"current,omitempty"`
 	History     []struct {
-		User            Member
+		User            User
 		From            time.Time
 		FromRaw         int64 `json:"from"`
 		To              time.Time

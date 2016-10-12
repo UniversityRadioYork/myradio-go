@@ -7,6 +7,15 @@ import (
 	"time"
 )
 
+// User represents a MyRadio user.
+type User struct {
+	Memberid     int
+	Fname, Sname string
+	Sex          string
+	Email        string `json:"public_email"`
+	Receiveemail bool   `json:"receive_email"`
+}
+
 // Officership represents an officership a user holds.
 type Officership struct {
 	OfficerId   uint   `json:"officerid,string"`
