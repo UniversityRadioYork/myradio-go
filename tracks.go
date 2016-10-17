@@ -31,7 +31,7 @@ type Album struct {
 	// ShelfLetter is the shelf on which the physical copy resides, if any.
 	ShelfLetter string `json:"shelf_letter"`
 	// ShelfNumber is the position on the shelf on which the physical copy resides, if any.
-	ShelfNumber string `json:"shelf_number"`
+	ShelfNumber uint64 `json:"shelf_number"`
 
 	// Format is a single-character code identifying the physical format.
 	Format string `json:"format"`
