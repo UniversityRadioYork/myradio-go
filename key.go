@@ -28,15 +28,17 @@ var KeyFiles = []string{
 	"/usr/local/etc/myradio.key",
 }
 
-func getApiKey() (apikey string, err error) {
-	apikey, err = getApiKeyEnv()
+// getAPIKey tries to get an API key from all possible sources.
+func getAPIKey() (apikey string, err error) {
+	apikey, err = getAPIKeyEnv()
 	if err != nil {
-		apikey, err = getApiKeyFile()
+		apikey, err = getAPIKeyFile()
 	}
 	return
 }
 
-func getApiKeyEnv() (apikey string, err error) {
+// getAPIKey tries to get an API key from the environment.
+func getAPIKeyEnv() (apikey string, err error) {
 	apikey, err = os.Getenv("MYRADIOKEYFILE"), nil
 	if apikey == "" {
 		err = ErrNoMYRADIOKEYFILE
@@ -44,9 +46,10 @@ func getApiKeyEnv() (apikey string, err error) {
 	return
 }
 
-func getApiKeyFile() (apikey string, err error) {
+// getAPIKeyFile tries to get an API key from a known file.
+func getAPIKeyFile() (apikey string, err error) {
 	for _, rawPath := range KeyFiles {
-		apikey = getApiKeyFromFile(rawPath)
+		apikey = getAPIKeyFromFile(rawPath)
 		if apikey != "" {
 			return
 		}
@@ -57,9 +60,9 @@ func getApiKeyFile() (apikey string, err error) {
 	return
 }
 
-// getApiKeyFromFile tries to get an apikey from a file.
+// getAPIKeyFromFile tries to get an apikey from a file.
 // Returns an empty string if it fails
-func getApiKeyFromFile(path string) string {
+func getAPIKeyFromFile(path string) string {
 	path = os.ExpandEnv(path)
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -70,7 +73,6 @@ func getApiKeyFromFile(path string) string {
 }
 
 // NewSessionFromKeyFile tries to open a Session with the key from an API key file.
-//
 // This tries the following paths for a file containing one line (the API key):
 //   1) Whichever path is set in the environment variable `MYRADIOKEYFILE`;
 //   2) `.myradio.key`, in the current directory;
@@ -78,7 +80,7 @@ func getApiKeyFromFile(path string) string {
 //   4) `/etc/myradio.key`;
 //   5) `/usr/local/etc/myradio.key`.
 func NewSessionFromKeyFile() (*Session, error) {
-	apikey, err := getApiKey()
+	apikey, err := getAPIKey()
 	if err != nil {
 		return nil, err
 	}

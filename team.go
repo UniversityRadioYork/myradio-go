@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// Position represents a MyRadio officer position.
 type Position struct {
 	Team        Team   `json:"team"`
 	OfficerID   uint   `json:"officerid"`
@@ -17,6 +18,7 @@ type Position struct {
 	Type        string `json:"type"`
 }
 
+// Officer represents information about an officership inside a Team.
 type Officer struct {
 	User            Member `json:"user"`
 	From            time.Time
@@ -25,6 +27,7 @@ type Officer struct {
 	Position        Position `json:"position"`
 }
 
+// Team represents a station committee team.
 type Team struct {
 	TeamID      uint      `json:"teamid"`
 	Name        string    `json:"name"`
@@ -35,6 +38,7 @@ type Team struct {
 	Officers    []Officer `json:"officers"`
 }
 
+// HeadPosition represents the head position of a team.
 type HeadPosition struct {
 	User            Member
 	From            int
@@ -42,6 +46,8 @@ type HeadPosition struct {
 	Position        OfficerPosition
 }
 
+// GetCurrentTeams retrieves all teams inside the station committee.
+// This consumes one API request.
 func (s *Session) GetCurrentTeams() (teams []Team, err error) {
 	data, err := s.apiRequest("/team/currentteams/", []string{})
 	if err != nil {
@@ -54,6 +60,8 @@ func (s *Session) GetCurrentTeams() (teams []Team, err error) {
 	return
 }
 
+// GetTeamWithOfficers retrieves a team record with officer information for the given team name.
+// This consumes one API request.
 func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/team/byalias/%s", teamName), []string{"officers"})
 	if err != nil {
@@ -69,6 +77,9 @@ func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
 	return
 }
 
+// GetTeamHeadPositions retrieves all head-of-team positions for a given team ID.
+// The amount of detail can be controlled using MyRadio mixins.
+// This consumes one API request.
 func (s *Session) GetTeamHeadPositions(id int, mixins []string) (head []HeadPosition, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/team/%d/headpositions", id), mixins)
 	if err != nil {

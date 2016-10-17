@@ -9,11 +9,13 @@ import (
 	"strings"
 )
 
+// Session represents an open API session.
 type Session struct {
 	apikey  string
 	baseurl url.URL
 }
 
+// NewSession constructs a new Session with the given API key.
 func NewSession(apikey string) (*Session, error) {
 	url, err := url.Parse(`https://ury.york.ac.uk/api/v2`)
 	if err != nil {
@@ -25,6 +27,7 @@ func NewSession(apikey string) (*Session, error) {
 	}, nil
 }
 
+// apiResponse provides the base structure of MyRadio API responses.
 type apiResponse struct {
 	Status  string
 	Payload *json.RawMessage
@@ -59,15 +62,15 @@ func (s *Session) apiRequestWithParams(endpoint string, mixins []string, params 
 	if err != nil {
 		return nil, err
 	}
-	var resJson apiResponse
-	err = json.Unmarshal(data, &resJson)
+	var response apiResponse
+	err = json.Unmarshal(data, &response)
 	if err != nil {
 		return nil, err
 	}
-	if resJson.Status != "OK" {
-		return nil, fmt.Errorf(endpoint + fmt.Sprintf(" Response not OK: %v", resJson))
+	if response.Status != "OK" {
+		return nil, fmt.Errorf(endpoint + fmt.Sprintf(" Response not OK: %v", response))
 	}
-	return resJson.Payload, nil
+	return response.Payload, nil
 }
 
 // apiRequest conducts a GET request without custom parameters.
