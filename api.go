@@ -9,22 +9,16 @@ import (
 	"strings"
 )
 
-// Session represents an open API session.
-type Session struct {
-	apikey  string
-	baseurl url.URL
+// apiRequester is the type of anything that can handle an API request.
+type apiRequester interface {
+	// request sends out a full API request.
+	request(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error)
 }
 
-// NewSession constructs a new Session with the given API key.
-func NewSession(apikey string) (*Session, error) {
-	url, err := url.Parse(`https://ury.york.ac.uk/api/v2`)
-	if err != nil {
-		return nil, err
-	}
-	return &Session{
-		apikey:  apikey,
-		baseurl: *url,
-	}, nil
+// AuthedRequester answers API requests by making an authed API call.
+type authedRequester struct {
+	apikey  string
+	baseurl url.URL
 }
 
 // apiResponse provides the base structure of MyRadio API responses.
@@ -33,8 +27,8 @@ type apiResponse struct {
 	Payload *json.RawMessage
 }
 
-// apiRequestWithParams conducts a GET request with custom parameters.
-func (s *Session) apiRequestWithParams(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error) {
+// request fulfils an API request by making an authed API call.
+func (s *authedRequester) request(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error) {
 	urlParams := url.Values{
 		"api_key": []string{s.apikey},
 		"mixins":  []string{strings.Join(mixins, ",")},
@@ -71,6 +65,52 @@ func (s *Session) apiRequestWithParams(endpoint string, mixins []string, params 
 		return nil, fmt.Errorf(endpoint + fmt.Sprintf(" Response not OK: %v", response))
 	}
 	return response.Payload, nil
+}
+
+// mockRequester answers API requests by returning some stock response.
+type mockRequester struct {
+	message *json.RawMessage
+}
+
+// request pretends to fulfil an API request, but actually returns the mockRequester's stock response.
+func (s *mockRequester) request(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error) {
+	return s.message, nil
+}
+
+// Session represents an open API session.
+type Session struct {
+	requester apiRequester
+}
+
+// NewSession constructs a new Session with the given API key.
+func NewSession(apikey string) (*Session, error) {
+	url, err := url.Parse(`https://ury.york.ac.uk/api/v2`)
+	if err != nil {
+		return nil, err
+	}
+	return &Session{
+		requester: &authedRequester{
+			apikey:  apikey,
+			baseurl: *url,
+		},
+	}, nil
+}
+
+// MockSession creates a new mocked API session returning the JSON message stored in message.
+func MockSession(message []byte) (*Session, error) {
+	rm := json.RawMessage{}
+	err := rm.UnmarshalJSON(message)
+	if err != nil {
+		return nil, err
+	}
+	return &Session{
+		requester: &mockRequester{message: &rm},
+	}, nil
+}
+
+// apiRequestWithParams conducts a GET request with custom parameters.
+func (s *Session) apiRequestWithParams(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error) {
+	return s.requester.request(endpoint, mixins, params)
 }
 
 // apiRequest conducts a GET request without custom parameters.
