@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// Member represents a MyRadio user.
 type Member struct {
 	Memberid     int
 	Fname, Sname string
@@ -13,6 +14,8 @@ type Member struct {
 	Receiveemail bool   `json:"receive_email"`
 }
 
+// GetMember retrieves the user with the given ID.
+// This consumes one API request.
 func (s *Session) GetMember(id int) (*Member, error) {
 	data, err := s.apiRequest(fmt.Sprintf("/user/%d", id), []string{"personal_data"})
 	if err != nil {

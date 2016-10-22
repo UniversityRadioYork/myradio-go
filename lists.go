@@ -5,6 +5,7 @@ import (
 	"fmt"
 )
 
+// List represents a mailing list.
 type List struct {
 	Listid     int
 	Name       string
@@ -12,6 +13,8 @@ type List struct {
 	Recipients int `json:"recipient_count"`
 }
 
+// GetAllLists retrieves all mailing lists in the MyRadio system.
+// This consumes one API request.
 func (s *Session) GetAllLists() ([]List, error) {
 	data, err := s.apiRequest("/list/alllists", nil)
 	if err != nil {
@@ -25,6 +28,8 @@ func (s *Session) GetAllLists() ([]List, error) {
 	return lists, nil
 }
 
+// GetMembers retrieves all members subscribed to a given mailing list.
+// This consumes one API request.
 func (s *Session) GetMembers(l *List) ([]Member, error) {
 	data, err := s.apiRequest(fmt.Sprintf("/list/%d/members", l.Listid), []string{"personal_data"})
 	if err != nil {

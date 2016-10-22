@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// OfficerPosition represents a specific station officer position.
 type OfficerPosition struct {
 	OfficerID   int
 	Name        string
@@ -25,6 +26,9 @@ type OfficerPosition struct {
 	} `json:"history,omitempty"`
 }
 
+// GetAllOfficerPositions retrieves all officer positions in MyRadio.
+// The amount of detail can be controlled by adding MyRadio mixins.
+// This consumes one API request.
 func (s *Session) GetAllOfficerPositions(mixins []string) ([]OfficerPosition, error) {
 	data, err := s.apiRequest("/officer/allofficerpositions", mixins)
 	if err != nil {
