@@ -1,8 +1,9 @@
-package myradio
+package myradio_test
 
 import (
 	"reflect"
 	"testing"
+	myradio "github.com/UniversityRadioYork/myradio-go"
 )
 
 const getSearchMetaJson = `
@@ -56,15 +57,15 @@ const getSearchMetaJson = `
 // TestGetSearchMetaUnmarshal tests the unmarshalling logic of GetSearchMeta.
 // It does not test the API endpoint.
 func TestGetSearchMetaUnmarshal(t *testing.T) {
-	expected := []ShowMeta{{
+	expected := []myradio.ShowMeta{{
 		ShowID:        8675309,
 		Title:         "Jenny I've Got Your Number",
 		CreditsString: "Tommy Tutone",
-		Credits: []Credit{
+		Credits: []myradio.Credit{
 			{
 				Type:     1,
 				MemberID: 666,
-				User: Member{
+				User: myradio.Member{
 					Memberid:     666,
 					Fname:        "Tommy",
 					Sname:        "Tutone",
@@ -76,25 +77,25 @@ func TestGetSearchMetaUnmarshal(t *testing.T) {
 		},
 		Description: "Tommy Tutone's got your number, and he's gotta make you his.",
 		ShowTypeID:  1,
-		Season: Link{
+		Season: myradio.Link{
 			Display: "season display",
 			Value:   "https://myradio.example.com/seasons/512",
 			Title:   "Seasons",
 			URL:     "https://myradio.example.com/seasons/512",
 		},
-		EditLink: Link{
+		EditLink: myradio.Link{
 			Display: "edit display",
 			Value:   "https://myradio.example.com/edit/8675309",
 			Title:   "Edit",
 			URL:     "https://myradio.example.com/edit/8675309",
 		},
-		ApplyLink: Link{
+		ApplyLink: myradio.Link{
 			Display: "apply display",
 			Value:   "https://myradio.example.com/apply/8675309",
 			Title:   "Apply",
 			URL:     "https://myradio.example.com/apply/8675309",
 		},
-		MicroSiteLink: Link{
+		MicroSiteLink: myradio.Link{
 			Display: "microsite display",
 			Value:   "https://myradio.example.com/microsites/8675309",
 			Title:   "Microsites",
@@ -103,7 +104,7 @@ func TestGetSearchMetaUnmarshal(t *testing.T) {
 		Photo: "https://myradio.example.com/photos/shows/8675309",
 	}}
 
-	session, err := MockSession([]byte(getSearchMetaJson))
+	session, err := myradio.MockSession([]byte(getSearchMetaJson))
 	if err != nil {
 		t.Error(err)
 	}
