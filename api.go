@@ -15,7 +15,7 @@ type apiRequester interface {
 	request(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error)
 }
 
-// AuthedRequester answers API requests by making an authed API call.
+// authedRequester answers API requests by making an authed API call.
 type authedRequester struct {
 	apikey  string
 	baseurl url.URL
