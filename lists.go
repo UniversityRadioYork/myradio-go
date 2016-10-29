@@ -28,17 +28,17 @@ func (s *Session) GetAllLists() ([]List, error) {
 	return lists, nil
 }
 
-// GetMembers retrieves all members subscribed to a given mailing list.
+// GetUsers retrieves all users subscribed to a given mailing list.
 // This consumes one API request.
-func (s *Session) GetMembers(l *List) ([]Member, error) {
+func (s *Session) GetUsers(l *List) ([]User, error) {
 	data, err := s.apiRequest(fmt.Sprintf("/list/%d/members", l.Listid), []string{"personal_data"})
 	if err != nil {
 		return nil, err
 	}
-	var members []Member
-	err = json.Unmarshal(*data, &members)
+	var user []User
+	err = json.Unmarshal(*data, &user)
 	if err != nil {
 		return nil, err
 	}
-	return members, nil
+	return user, nil
 }

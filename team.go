@@ -20,7 +20,7 @@ type Position struct {
 
 // Officer represents information about an officership inside a Team.
 type Officer struct {
-	User            Member `json:"user"`
+	User            User `json:"user"`
 	From            time.Time
 	FromRaw         int64    `json:"from"`
 	MemberOfficerID uint     `json:"memberofficerid"`
@@ -40,7 +40,7 @@ type Team struct {
 
 // HeadPosition represents the head position of a team.
 type HeadPosition struct {
-	User            Member
+	User            User
 	From            int
 	MemberOfficerID int
 	Position        OfficerPosition
