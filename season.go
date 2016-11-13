@@ -17,11 +17,16 @@ func (s *Session) GetSeason(id int) (season Season, err error) {
 	if err != nil {
 		return
 	}
-	season.FirstTime, err = time.Parse("02/01/2006 15:04", season.FirstTimeRaw)
-	if err != nil {
-		return
+	if season.FirstTimeRaw != "Not Scheduled" {
+		season.FirstTime, err = time.Parse("02/01/2006 15:04", season.FirstTimeRaw)
+		if err != nil {
+			return
+		}
 	}
-	season.Submitted, err = time.Parse("02/01/2006 15:04", season.SubmittedRaw)
+
+	if season.SubmittedRaw != "Not Scheduled" {
+		season.Submitted, err = time.Parse("02/01/2006 15:04", season.SubmittedRaw)
+	}
 	return
 }
 
