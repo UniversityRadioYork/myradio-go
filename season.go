@@ -74,7 +74,7 @@ func (s *Session) GetAllSeasonsInLatestTerm() (seasons []Season, err error) {
 				return
 			}
 		}
-		if season.FirstTimeRaw != "Not Scheduled" {
+		if season.SubmittedRaw != "Not Scheduled" {
 			seasons[k].Submitted, err = time.Parse("02/01/2006 15:04", season.SubmittedRaw)
 			if err != nil {
 				return
