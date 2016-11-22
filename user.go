@@ -43,6 +43,21 @@ type UserAlias struct {
 	Destination string
 }
 
+// GetUser retrieves the User with the given ID.
+// This consumes one API request.
+func (s *Session) GetUser(id int) (*User, error) {
+	data, err := s.apiRequest(fmt.Sprintf("/user/%d", id), []string{"personal_data"})
+	if err != nil {
+		return nil, err
+	}
+	var user User
+	err = json.Unmarshal(*data, &user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
+
 // GetUserBio retrieves the biography of the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserBio(id int) (bio string, err error) {
