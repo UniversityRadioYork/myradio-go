@@ -86,9 +86,7 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 	}
 
 	currentAndNext.Current.StartTime = time.Unix(currentAndNext.Current.StartTimeRaw, 0)
-	//currentAndNext.Current.EndTime = time.Unix(currentAndNext.Current.EndTimeRaw, 0)
 	currentAndNext.Next.StartTime = time.Unix(currentAndNext.Next.StartTimeRaw, 0)
-	//currentAndNext.Next.EndTime = time.Unix(currentAndNext.Next.EndTimeRaw, 0)
 	return &currentAndNext, nil
 }
 
