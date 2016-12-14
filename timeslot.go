@@ -75,14 +75,14 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 		if err != nil {
 			return nil, err
 		}
-		currentAndNext.Current.EndTime = time.Unix(nextEndTime, 0)
+		currentAndNext.Current.EndTime = time.Unix(currentEndTime, 0)
 	}
 	if (currentAndNext.Next.EndTimeRaw != "The End of Time") && (currentAndNext.Next.EndTimeRaw != "") {
 		nextEndTime, err = strconv.ParseInt(currentAndNext.Next.EndTimeRaw, 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		currentAndNext.Next.EndTime = time.Unix(currentEndTime, 0)
+		currentAndNext.Next.EndTime = time.Unix(nextEndTime, 0)
 	}
 
 	currentAndNext.Current.StartTime = time.Unix(currentAndNext.Current.StartTimeRaw, 0)
