@@ -38,9 +38,11 @@ func (s *Session) GetTimeslotsForSeason(id int) (timeslots []Timeslot, err error
 	}
 	for k, v := range timeslots {
 		timeslots[k].Time = time.Unix(v.TimeRaw, 0)
-		timeslots[k].FirstTime, err = time.Parse("02/01/2006 15:04", v.FirstTimeRaw)
-		if err != nil {
-			return
+		if v.FirstTimeRaw != "Not Scheduled" {
+			timeslots[k].FirstTime, err = time.Parse("02/01/2006 15:04", v.FirstTimeRaw)
+			if err != nil {
+				return
+			}
 		}
 		timeslots[k].Submitted, err = time.Parse("02/01/2006 15:04", v.SubmittedRaw)
 		if err != nil {

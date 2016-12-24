@@ -113,9 +113,11 @@ func (s *Session) GetSeasons(id int) (seasons []Season, err error) {
 		return
 	}
 	for k, v := range seasons {
-		seasons[k].FirstTime, err = time.Parse("02/01/2006 15:04", v.FirstTimeRaw)
-		if err != nil {
-			return
+		if v.FirstTimeRaw != "Not Scheduled" {
+			seasons[k].FirstTime, err = time.Parse("02/01/2006 15:04", v.FirstTimeRaw)
+			if err != nil {
+				return
+			}
 		}
 		seasons[k].Submitted, err = time.Parse("02/01/2006 15:04", v.SubmittedRaw)
 		if err != nil {
