@@ -9,8 +9,8 @@ import (
 
 // CurrentAndNext stores a pair of current and next show.
 type CurrentAndNext struct {
-	Next    Show `json:"next"`
-	Current Show `json:"current"`
+	Next    []Show `json:"next"`
+	Current Show   `json:"current"`
 }
 
 // Show contains a summary of information about a URY schedule timeslot.
@@ -59,7 +59,8 @@ type TracklistItem struct {
 // GetCurrentAndNext gets the current and next shows at the time of the call.
 // This consumes one API request.
 func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
-	data, err := s.apiRequest("/timeslot/currentandnext", []string{})
+	params := map[string][]string{"n": {"12"}}
+	data, err := s.apiRequestWithParams("/timeslot/currentandnext", []string{}, params)
 	if err != nil {
 		return nil, err
 	}
@@ -70,8 +71,12 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 	}
 	currentAndNext.Current.StartTime = time.Unix(currentAndNext.Current.StartTimeRaw, 0)
 	currentAndNext.Current.EndTime = time.Unix(currentAndNext.Current.EndTimeRaw, 0)
-	currentAndNext.Next.StartTime = time.Unix(currentAndNext.Next.StartTimeRaw, 0)
-	currentAndNext.Next.EndTime = time.Unix(currentAndNext.Next.EndTimeRaw, 0)
+
+	for i := 0; i < len(currentAndNext.Next); i++ {
+		currentAndNext.Next[i].StartTime = time.Unix(currentAndNext.Next[i].StartTimeRaw, 0)
+		currentAndNext.Next[i].EndTime = time.Unix(currentAndNext.Next[i].EndTimeRaw, 0)
+	}
+
 	return &currentAndNext, nil
 }
 
