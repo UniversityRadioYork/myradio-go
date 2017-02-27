@@ -31,7 +31,9 @@ type apiResponse struct {
 func (s *authedRequester) request(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error) {
 	urlParams := url.Values{
 		"api_key": []string{s.apikey},
-		"mixins":  []string{strings.Join(mixins, ",")},
+	}
+	if len(mixins) > 0 {
+		urlParams.Add("mixins", strings.Join(mixins, ","))
 	}
 	for k, vs := range params {
 		for _, v := range vs {
