@@ -18,7 +18,7 @@ func TestParseDuration(t *testing.T) {
 	for _, test := range tests {
 		// We can safely leave testing the time lib to the stl
 		expected, _ := time.ParseDuration(test.expectedStr)
-		got, err := parseDuration("15:04:05", test.time)
+		got, err := parseDuration(test.time)
 		if err != nil || got != expected {
 			t.Error("Got:", got, ", Expected:", expected, ", Error:", err)
 		}

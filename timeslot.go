@@ -93,7 +93,7 @@ func populateTimes(timeslot *Timeslot) error {
 	if err != nil {
 		return err
 	}
-	timeslot.Duration, err = parseDuration("15:04:05", timeslot.DurationRaw)
+	timeslot.Duration, err = parseDuration(timeslot.DurationRaw)
 	if err != nil {
 		return err
 	}
