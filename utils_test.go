@@ -12,6 +12,7 @@ func TestParseDuration(t *testing.T) {
 	}{
 		{"2h", "02:00:00"},
 		{"30m", "00:30:00"},
+		{"30h", "30:00:00"},
 	}
 
 	for _, test := range tests {
