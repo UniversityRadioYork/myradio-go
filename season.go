@@ -52,7 +52,7 @@ func (s *Session) GetTimeslotsForSeason(id int) (timeslots []Timeslot, err error
 		if err != nil {
 			return
 		}
-		timeslots[k].Duration, err = parseDuration("15:04:05", v.DurationRaw)
+		timeslots[k].Duration, err = parseDuration(v.DurationRaw)
 		if err != nil {
 			return
 		}

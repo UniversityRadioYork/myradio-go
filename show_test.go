@@ -65,7 +65,7 @@ func TestGetSearchMetaUnmarshal(t *testing.T) {
 			{
 				Type:     1,
 				MemberID: 666,
-				User: myradio.Member{
+				User: myradio.User{
 					Memberid:     666,
 					Fname:        "Tommy",
 					Sname:        "Tutone",
