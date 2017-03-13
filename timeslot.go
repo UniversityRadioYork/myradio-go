@@ -20,7 +20,7 @@ type Show struct {
 	Photo        string `json:"photo"`
 	StartTimeRaw int64  `json:"start_time"`
 	StartTime    time.Time
-	EndTimeRaw   int64 `json:"end_time"`
+	EndTimeRaw   string `json:"end_time"`
 	EndTime      time.Time
 	Presenters   string `json:"presenters,omitempty"`
 	Url          string `json:"url,omitempty"`
@@ -64,14 +64,29 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 		return nil, err
 	}
 	var currentAndNext CurrentAndNext
+	var currentEndTime int64
+	var nextEndTime int64
 	err = json.Unmarshal(*data, &currentAndNext)
 	if err != nil {
 		return nil, err
 	}
+	if currentAndNext.Current.EndTimeRaw != "The End of Time" && (currentAndNext.Current.EndTimeRaw != "") {
+		currentEndTime, err = strconv.ParseInt(currentAndNext.Current.EndTimeRaw, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		currentAndNext.Current.EndTime = time.Unix(currentEndTime, 0)
+	}
+	if (currentAndNext.Next.EndTimeRaw != "The End of Time") && (currentAndNext.Next.EndTimeRaw != "") {
+		nextEndTime, err = strconv.ParseInt(currentAndNext.Next.EndTimeRaw, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		currentAndNext.Next.EndTime = time.Unix(nextEndTime, 0)
+	}
+
 	currentAndNext.Current.StartTime = time.Unix(currentAndNext.Current.StartTimeRaw, 0)
-	currentAndNext.Current.EndTime = time.Unix(currentAndNext.Current.EndTimeRaw, 0)
 	currentAndNext.Next.StartTime = time.Unix(currentAndNext.Next.StartTimeRaw, 0)
-	currentAndNext.Next.EndTime = time.Unix(currentAndNext.Next.EndTimeRaw, 0)
 	return &currentAndNext, nil
 }
 
