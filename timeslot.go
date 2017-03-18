@@ -129,7 +129,13 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 		return nil, err
 	}
 
-	// Now convert the string keys into proper indices.
+	return destringTimeslots(stringyTimeslots)
+}
+
+// destringTimeslots converts a week schedule from string indices to integer indices.
+// It takes a map from strings "1"--"7" to day schedules, and returns a map from integers 1--7 to day schedules.
+// It returns an error if any of the string indices cannot be converted.
+func destringTimeslots(stringyTimeslots map[string][]Timeslot) (map[int][]Timeslot, error) {
 	timeslots := make(map[int][]Timeslot)
 	for sday, ts := range stringyTimeslots {
 		day, err := strconv.Atoi(sday)
