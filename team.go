@@ -6,25 +6,13 @@ import (
 	"time"
 )
 
-// Position represents a MyRadio officer position.
-type Position struct {
-	Team        Team   `json:"team"`
-	OfficerID   uint   `json:"officerid"`
-	Name        string `json:"name"`
-	Alias       string `json:"alias"`
-	Ordering    uint   `json:"ordering"`
-	Description string `json:"description"`
-	Status      string `json:"status"`
-	Type        string `json:"type"`
-}
-
 // Officer represents information about an officership inside a Team.
 type Officer struct {
 	User            User `json:"user"`
 	From            time.Time
-	FromRaw         int64    `json:"from"`
-	MemberOfficerID uint     `json:"memberofficerid"`
-	Position        Position `json:"position"`
+	FromRaw         int64           `json:"from"`
+	MemberOfficerID uint            `json:"memberofficerid"`
+	Position        OfficerPosition `json:"position"`
 }
 
 // Team represents a station committee team.
@@ -36,14 +24,6 @@ type Team struct {
 	Description string    `json:"description"`
 	Status      string    `json:"status"`
 	Officers    []Officer `json:"officers"`
-}
-
-// HeadPosition represents the head position of a team.
-type HeadPosition struct {
-	User            User
-	From            int
-	MemberOfficerID int
-	Position        OfficerPosition
 }
 
 // GetCurrentTeams retrieves all teams inside the station committee.
@@ -80,7 +60,7 @@ func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
 // GetTeamHeadPositions retrieves all head-of-team positions for a given team ID.
 // The amount of detail can be controlled using MyRadio mixins.
 // This consumes one API request.
-func (s *Session) GetTeamHeadPositions(id int, mixins []string) (head []HeadPosition, err error) {
+func (s *Session) GetTeamHeadPositions(id int, mixins []string) (head []Officer, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/team/%d/headpositions", id), mixins)
 	if err != nil {
 		return
