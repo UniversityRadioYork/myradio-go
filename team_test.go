@@ -4,6 +4,8 @@ import (
 	"reflect"
 	"testing"
 
+	"time"
+
 	myradio "github.com/UniversityRadioYork/myradio-go"
 )
 
@@ -54,6 +56,7 @@ func TestGetTeamHeadPositions(t *testing.T) {
 				Email:        "john.smith@example.org.uk",
 				Receiveemail: true,
 			},
+			From:            time.Unix(1479081600, 0),
 			FromRaw:         1479081600,
 			MemberOfficerID: 1,
 			Position: myradio.OfficerPosition{
@@ -104,6 +107,7 @@ func TestGetTeamAssistantHeadPositions(t *testing.T) {
 				Email:        "john.smith@example.org.uk",
 				Receiveemail: true,
 			},
+			From:            time.Unix(1479081600, 0),
 			FromRaw:         1479081600,
 			MemberOfficerID: 1,
 			Position: myradio.OfficerPosition{
