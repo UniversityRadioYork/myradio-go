@@ -84,21 +84,21 @@ func (s *Session) GetTeamHeadPositions(id int, mixins []string) (head []Officer,
 // GetTeamAssistantHeadPositions retrieves all assistant-head-of-team positions for a given team ID.
 // The amount of detail can be controlled using MyRadio mixins.
 // This consumes one API request.
-func (s *Session) GetTeamAssistantHeadPositions(id int, mixins []string) (assiHead []Officer, err error) {
+func (s *Session) GetTeamAssistantHeadPositions(id int, mixins []string) (assHead []Officer, err error) {
 	data, err := s.apiRequest(fmt.Sprintf("/team/%d/assistantheadpositions", id), mixins)
 	if err != nil {
 		return
 	}
-	err = json.Unmarshal(*data, &assiHead)
+	err = json.Unmarshal(*data, &assHead)
 	if err != nil {
 		return
 	}
-	for k, v := range assiHead {
-		assiHead[k].From = time.Unix(v.FromRaw, 0)
+	for k, v := range assHead {
+		assHead[k].From = time.Unix(v.FromRaw, 0)
 		if v.Position.History != nil {
 			for ik, iv := range v.Position.History {
-				assiHead[k].Position.History[ik].From = time.Unix(iv.FromRaw, 0)
-				assiHead[k].Position.History[ik].To = time.Unix(iv.ToRaw, 0)
+				assHead[k].Position.History[ik].From = time.Unix(iv.FromRaw, 0)
+				assHead[k].Position.History[ik].To = time.Unix(iv.ToRaw, 0)
 			}
 		}
 	}
