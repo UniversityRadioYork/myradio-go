@@ -1,13 +1,16 @@
 language: go
 sudo: false
+
+go:
+  - 1.6
+  - 1.7
+  - 1.8
+  - tip
+
 notifications:
   email: false
-go: 
- - 1.6.x
- - 1.7.x
- - 1.8.x
- - tip
+
 before_install:
-  - go get github.com/mattn/goveralls
+  - if [ "$TRAVIS_GO_VERSION" = "1.8" ]; then go get github.com/mattn/goveralls; fi
 script:
-  - $HOME/gopath/bin/goveralls -service=travis-ci
+  - if [ "$TRAVIS_GO_VERSION" = "1.8" ]; then $HOME/gopath/bin/goveralls -service=travis-ci; fi
