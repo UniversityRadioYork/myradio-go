@@ -7,7 +7,7 @@ import (
 	myradio "github.com/UniversityRadioYork/myradio-go"
 )
 
-const assistantHeadPositionJSON = `
+const positionJSON = `
 [{
 	"User": {
 		"memberid": 10,
@@ -41,7 +41,7 @@ const assistantHeadPositionJSON = `
 	}
 }]`
 
-// TestGetSearchMetaUnmarshal tests the unmarshalling logic of GetSearchMeta.
+// TestGetTeamHeadPositions tests the getter for head positions of a team.
 // It does not test the API endpoint.
 func TestGetTeamHeadPositions(t *testing.T) {
 	expected := []myradio.Officer{
@@ -76,7 +76,57 @@ func TestGetTeamHeadPositions(t *testing.T) {
 		},
 	}
 
-	session, err := myradio.MockSession([]byte(assistantHeadPositionJSON))
+	session, err := myradio.MockSession([]byte(positionJSON))
+	if err != nil {
+		t.Error(err)
+	}
+
+	heads, err := session.GetTeamHeadPositions(1, nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if !reflect.DeepEqual(heads, expected) {
+		t.Errorf("expected:\n%v\n\ngot:\n%v", expected, heads)
+	}
+}
+
+// TestGetTeamAssistantHeadPositions tests the getter for assistant head positions of a team.
+// It does not test the API endpoint.
+func TestGetTeamAssistantHeadPositions(t *testing.T) {
+	expected := []myradio.Officer{
+		{
+			User: myradio.User{
+				Memberid:     10,
+				Fname:        "John",
+				Sname:        "Smith",
+				Sex:          "m",
+				Email:        "john.smith@example.org.uk",
+				Receiveemail: true,
+			},
+			FromRaw:         1479081600,
+			MemberOfficerID: 1,
+			Position: myradio.OfficerPosition{
+				OfficerID: 2,
+				Name:      "Station Manager",
+				Alias:     "station.manager",
+				Team: myradio.Team{
+					TeamID:      1,
+					Name:        "Station Management",
+					Alias:       "management",
+					Ordering:    10,
+					Description: "",
+					Status:      "c",
+				},
+				Ordering:    2,
+				Description: "",
+				Status:      "c",
+				Type:        "a",
+			},
+		},
+	}
+
+	session, err := myradio.MockSession([]byte(positionJSON))
 	if err != nil {
 		t.Error(err)
 	}
