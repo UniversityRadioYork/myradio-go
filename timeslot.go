@@ -107,9 +107,11 @@ func populateTimes(timeslot *Timeslot) error {
 }
 
 // GetWeekSchedule gets the weekly schedule for ISO 8601 week week of year year.
-// It returns the result as an map from ISO 8601 weekdays to timeslot slices.
+// If such a schedule exists, it returns the result as an map from ISO 8601 weekdays to timeslot slices.
 // Thus, 1 maps to Monday's timeslots; 2 to Tuesday; and so on.
 // Each slice progresses chronologically from start of URY day to finish of URY day.
+// If no such schedule exists, it returns a map of empty slices.
+// If an error occurred, this is returned in error, and the timeslot map is undefined.
 // This consumes one API request.
 func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 	// TODO(CaptainHayashi): proper errors
@@ -125,6 +127,20 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 		return nil, err
 	}
 
+	// MyRadio responds in a different way when the schedule is empty, so we need to catch that.
+	// See https://github.com/UniversityRadioYork/MyRadio/issues/665 for details.
+	if isEmptySchedule(data) {
+		return map[int][]Timeslot{
+			1: {},
+			2: {},
+			3: {},
+			4: {},
+			5: {},
+			6: {},
+			7: {},
+		}, nil
+	}
+
 	// The timeslots come to us with string keys labelled with the weekday.
 	// These timeslots start from "1" (Monday) and go up to "7" (Sunday).
 	// Note that this is different from Go's view of the week (0 = Sunday, 1 = Monday)!
@@ -134,7 +150,38 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 		return nil, err
 	}
 
-	// Now convert the string keys into proper indices.
+	return destringTimeslots(stringyTimeslots)
+}
+
+// isEmptySchedule tries to work out, from MyRadio schedule JSON, whether the schedule is empty.
+func isEmptySchedule(data *json.RawMessage) bool {
+	bs, err := data.MarshalJSON()
+	if err != nil {
+		// The logic later on in GetWeekSchedule should hit this same error, so handle it there.
+		return false
+	}
+
+	if len(bs) != 2 {
+		return false
+	}
+
+	// Due to a quirk in MyRadio (well, PHP), the empty schedule can be returned as the empty array '[]',
+	// instead of the empty object '{}'.
+	if bs[0] == '[' && bs[1] == ']' {
+		return true
+	}
+
+	if bs[0] == '{' && bs[1] == '}' {
+		return true
+	}
+
+	return false
+}
+
+// destringTimeslots converts a week schedule from string indices to integer indices.
+// It takes a map from strings "1"--"7" to day schedules, and returns a map from integers 1--7 to day schedules.
+// It returns an error if any of the string indices cannot be converted.
+func destringTimeslots(stringyTimeslots map[string][]Timeslot) (map[int][]Timeslot, error) {
 	timeslots := make(map[int][]Timeslot)
 	for sday, ts := range stringyTimeslots {
 		day, err := strconv.Atoi(sday)
