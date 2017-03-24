@@ -135,7 +135,7 @@ func TestGetTeamAssistantHeadPositions(t *testing.T) {
 		t.Error(err)
 	}
 
-	heads, err := session.GetTeamHeadPositions(1, nil)
+	heads, err := session.GetTeamAssistantHeadPositions(1, nil)
 	if err != nil {
 		t.Error(err)
 	}
