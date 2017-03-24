@@ -122,7 +122,7 @@ func (s *Session) GetUserOfficerships(id int) (officerships []Officership, err e
 			}
 		}
 		if officerships[k].TillDateRaw != "" {
-			officerships[k].TillDate, err = time.Parse("2006-01-02", v.FromDateRaw)
+			officerships[k].TillDate, err = time.Parse("2006-01-02", v.TillDateRaw)
 			if err != nil {
 				return
 			}
