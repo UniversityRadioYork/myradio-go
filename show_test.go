@@ -1,9 +1,9 @@
 package myradio_test
 
 import (
+	myradio "github.com/UniversityRadioYork/myradio-go"
 	"reflect"
 	"testing"
-	myradio "github.com/UniversityRadioYork/myradio-go"
 )
 
 const getSearchMetaJson = `
