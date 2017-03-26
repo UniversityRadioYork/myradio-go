@@ -61,7 +61,7 @@ func (s *Session) GetTimeslotsForSeason(id int) (timeslots []Timeslot, err error
 }
 
 // GetAllSeasonsInLatestTerm gets all seasons in the most recent term.
-// It consumes one API request.
+// This consumes one API request.
 func (s *Session) GetAllSeasonsInLatestTerm() (seasons []Season, err error) {
 	data, err := s.apiRequest("/season/allseasonsinlatestterm/", []string{})
 	if err != nil {
