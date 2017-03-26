@@ -55,6 +55,12 @@ type Season struct {
 	RejectLink    Link `json:"rejectlink"`
 }
 
+// isScheduled returns whether the Season has been scheduled.
+// This consumes no API requests.
+func (s *Season) isScheduled() bool {
+	return s.FirstTimeRaw != "Not Scheduled"
+}
+
 // GetSearchMeta retrieves all shows whose metadata matches a given search term.
 // This consumes one API request.
 func (s *Session) GetSearchMeta(term string) ([]ShowMeta, error) {
@@ -113,7 +119,7 @@ func (s *Session) GetSeasons(id int) (seasons []Season, err error) {
 		return
 	}
 	for k, v := range seasons {
-		if v.FirstTimeRaw != "Not Scheduled" {
+		if v.isScheduled() {
 			seasons[k].FirstTime, err = time.Parse("02/01/2006 15:04", v.FirstTimeRaw)
 			if err != nil {
 				return

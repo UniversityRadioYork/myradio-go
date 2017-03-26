@@ -72,13 +72,13 @@ func (s *Session) GetAllSeasonsInLatestTerm() (seasons []Season, err error) {
 		return
 	}
 	for k, season := range seasons {
-		if season.FirstTimeRaw != "Not Scheduled" {
+		if season.isScheduled() {
 			seasons[k].FirstTime, err = time.Parse("02/01/2006 15:04", season.FirstTimeRaw)
 			if err != nil {
 				return
 			}
 		}
-		if season.FirstTimeRaw != "Not Scheduled" {
+		if season.isScheduled() {
 			seasons[k].Submitted, err = time.Parse("02/01/2006 15:04", season.SubmittedRaw)
 			if err != nil {
 				return
