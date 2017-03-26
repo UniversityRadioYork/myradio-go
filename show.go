@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
-	"time"
 )
 
 // Credit represents a show credit associating a user with a show.
@@ -37,40 +36,6 @@ type Link struct {
 	Value   interface{} `json:"value"`
 	Title   string      `json:"title,omitempty"`
 	URL     string      `json:"url"`
-}
-
-// Season represents a season in the MyRadio schedule.
-// A MyRadio season contains timeslots.
-type Season struct {
-	ShowMeta
-	SeasonID      int    `json:"season_id"`
-	SeasonNum     int    `json:"season_num"`
-	SubmittedRaw  string `json:"submitted"`
-	Submitted     time.Time
-	RequestedTime string `json:"requested_time"`
-	FirstTimeRaw  string `json:"first_time"`
-	FirstTime     time.Time
-	NumEpisodes   Link `json:"num_episodes"`
-	AllocateLink  Link `json:"allocatelink"`
-	RejectLink    Link `json:"rejectlink"`
-}
-
-// isScheduled returns whether the Season has been scheduled.
-// This consumes no API requests.
-func (s *Season) isScheduled() bool {
-	return s.FirstTimeRaw != "Not Scheduled"
-}
-
-// populateSeasonTimes sets the times for the given Season given their raw values.
-func (s *Season) populateSeasonTimes() (err error) {
-	if s.isScheduled() {
-		s.FirstTime, err = parseShortTime(s.FirstTimeRaw)
-		if err != nil {
-			return
-		}
-	}
-	s.Submitted, err = parseShortTime(s.SubmittedRaw)
-	return
 }
 
 // GetSearchMeta retrieves all shows whose metadata matches a given search term.
