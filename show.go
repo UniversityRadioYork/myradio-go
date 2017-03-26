@@ -41,47 +41,37 @@ type Link struct {
 // GetSearchMeta retrieves all shows whose metadata matches a given search term.
 // This consumes one API request.
 func (s *Session) GetSearchMeta(term string) ([]ShowMeta, error) {
-
 	q := url.QueryEscape(term)
 
 	data, err := s.apiRequest(fmt.Sprintf("/show/searchmeta/%s", q), []string{})
-
 	if err != nil {
 		return nil, err
 	}
 
 	var shows []ShowMeta
-
 	err = json.Unmarshal(*data, &shows)
-
 	if err != nil {
 		return nil, err
 	}
 
 	return shows, nil
-
 }
 
 // GetShow retrieves the show with the given ID.
 // This consumes one API request.
 func (s *Session) GetShow(id int) (*ShowMeta, error) {
-
 	data, err := s.apiRequest(fmt.Sprintf("/show/%d", id), []string{})
-
 	if err != nil {
 		return nil, err
 	}
 
 	var show ShowMeta
-
 	err = json.Unmarshal(*data, &show)
-
 	if err != nil {
 		return nil, err
 	}
 
 	return &show, nil
-
 }
 
 // GetSeasons retrieves the seasons of the show with the given ID.
