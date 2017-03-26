@@ -82,7 +82,7 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 
 // populateTimes fills in the cooked times in a MyRadio timeslot from their raw equivalents.
 func populateTimes(timeslot *Timeslot) error {
-	var err error = nil
+	var err error
 	timeslot.Time = time.Unix(timeslot.TimeRaw, 0)
 
 	// MyRadio returns local timestamps, not UTC.
@@ -99,11 +99,7 @@ func populateTimes(timeslot *Timeslot) error {
 		return err
 	}
 	timeslot.Duration, err = parseDuration(timeslot.DurationRaw)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // GetWeekSchedule gets the weekly schedule for ISO 8601 week week of year year.
