@@ -43,6 +43,25 @@ type Timeslot struct {
 	MixcloudStatus string `json:"mixcloud_status"`
 }
 
+// populateTimeslotTimes sets the times for the given Timeslot given their raw values.
+func (t *Timeslot) populateTimeslotTimes() (err error) {
+	// Remember: a Timeslot is a supertype of Season.
+	err = t.populateSeasonTimes()
+	if err != nil {
+		return
+	}
+
+	t.Time = time.Unix(t.TimeRaw, 0)
+
+	t.StartTime, err = parseShortTime(t.StartTimeRaw)
+	if err != nil {
+		return
+	}
+
+	t.Duration, err = parseDuration(t.DurationRaw)
+	return
+}
+
 // TracklistItem represents a single item in a show tracklist.
 type TracklistItem struct {
 	Track
@@ -78,28 +97,6 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 		currentAndNext.Next.EndTime = time.Unix(timeint, 0)
 	}
 	return &currentAndNext, nil
-}
-
-// populateTimes fills in the cooked times in a MyRadio timeslot from their raw equivalents.
-func populateTimes(timeslot *Timeslot) error {
-	var err error
-	timeslot.Time = time.Unix(timeslot.TimeRaw, 0)
-
-	// MyRadio returns local timestamps, not UTC.
-	timeslot.FirstTime, err = time.ParseInLocation("02/01/2006 15:04", timeslot.FirstTimeRaw, time.Local)
-	if err != nil {
-		return err
-	}
-	timeslot.Submitted, err = time.ParseInLocation("02/01/2006 15:04", timeslot.SubmittedRaw, time.Local)
-	if err != nil {
-		return err
-	}
-	timeslot.StartTime, err = time.ParseInLocation("02/01/2006 15:04", timeslot.StartTimeRaw, time.Local)
-	if err != nil {
-		return err
-	}
-	timeslot.Duration, err = parseDuration(timeslot.DurationRaw)
-	return err
 }
 
 // GetWeekSchedule gets the weekly schedule for ISO 8601 week week of year year.
@@ -185,7 +182,7 @@ func destringTimeslots(stringyTimeslots map[string][]Timeslot) (map[int][]Timesl
 			return nil, err
 		}
 		for i := range ts {
-			err = populateTimes(&ts[i])
+			err = ts[i].populateTimeslotTimes()
 			if err != nil {
 				return nil, err
 			}
@@ -207,7 +204,7 @@ func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
 	if err != nil {
 		return
 	}
-	err = populateTimes(&timeslot)
+	err = timeslot.populateTimeslotTimes()
 	if err != nil {
 		return
 	}

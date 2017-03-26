@@ -8,6 +8,12 @@ import (
 	"time"
 )
 
+// parseShortTime parses times in MyRadio's 'DD/MM/YYYY HH:MM' local-time format.
+// On success, it returns the equivalent time; else, it reports an error.
+func parseShortTime(value string) (time.Time, error) {
+	return time.ParseInLocation("02/01/2006 15:04", value, time.Local)
+}
+
 // parseDuration parses durations in MyRadio's 'HH:MM:SS' format.
 // On success, it returns the equivalent duration; else, it reports an error.
 // Errors occur if the duration is not in the given format, or cannot be represented as a Duration.

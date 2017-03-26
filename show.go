@@ -61,15 +61,15 @@ func (s *Season) isScheduled() bool {
 	return s.FirstTimeRaw != "Not Scheduled"
 }
 
-// populateTimes sets the times for the given Season given their raw values.
-func (s *Season) populateTimes() (err error) {
+// populateSeasonTimes sets the times for the given Season given their raw values.
+func (s *Season) populateSeasonTimes() (err error) {
 	if s.isScheduled() {
-		s.FirstTime, err = time.Parse("02/01/2006 15:04", s.FirstTimeRaw)
+		s.FirstTime, err = parseShortTime(s.FirstTimeRaw)
 		if err != nil {
 			return
 		}
 	}
-	s.Submitted, err = time.Parse("02/01/2006 15:04", s.SubmittedRaw)
+	s.Submitted, err = parseShortTime(s.SubmittedRaw)
 	return
 }
 
@@ -131,7 +131,7 @@ func (s *Session) GetSeasons(id int) (seasons []Season, err error) {
 		return
 	}
 	for i := range seasons {
-		err = seasons[i].populateTimes()
+		err = seasons[i].populateSeasonTimes()
 		if err != nil {
 			return
 		}
