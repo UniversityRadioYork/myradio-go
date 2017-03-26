@@ -26,7 +26,7 @@ func parseDuration(value string) (dur time.Duration, err error) {
 
 	vs := strings.Split(value, ":")
 	if len(vs) != 3 {
-		err = fmt.Errorf("parseDuration: '%s' has %i sections but should have 3", value, len(vs))
+		err = fmt.Errorf("parseDuration: '%s' has %d sections but should have 3", value, len(vs))
 		return
 	}
 
@@ -50,7 +50,7 @@ func parseDuration(value string) (dur time.Duration, err error) {
 
 		// At this stage, val will contain the parsed value: this is just an additional sanity check.
 		if val < min || max < val {
-			err = fmt.Errorf("parseDuration: expected %i-%i, got %i", min, max, val)
+			err = fmt.Errorf("parseDuration: expected %d-%d, got %d", min, max, val)
 		}
 
 		return
