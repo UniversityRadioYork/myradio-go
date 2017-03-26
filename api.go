@@ -50,6 +50,9 @@ func (s *authedRequester) request(endpoint string, mixins []string, params map[s
 	}
 	client := &http.Client{}
 	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	if res.StatusCode != 200 {
 		return nil, fmt.Errorf(endpoint + fmt.Sprintf(" Not ok: HTTP %d", res.StatusCode))
 	}
