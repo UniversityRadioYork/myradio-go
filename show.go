@@ -61,6 +61,18 @@ func (s *Season) isScheduled() bool {
 	return s.FirstTimeRaw != "Not Scheduled"
 }
 
+// populateTimes sets the times for the given Season given their raw values.
+func (s *Season) populateTimes() (err error) {
+	if s.isScheduled() {
+		s.FirstTime, err = time.Parse("02/01/2006 15:04", s.FirstTimeRaw)
+		if err != nil {
+			return
+		}
+	}
+	s.Submitted, err = time.Parse("02/01/2006 15:04", s.SubmittedRaw)
+	return
+}
+
 // GetSearchMeta retrieves all shows whose metadata matches a given search term.
 // This consumes one API request.
 func (s *Session) GetSearchMeta(term string) ([]ShowMeta, error) {
@@ -118,14 +130,8 @@ func (s *Session) GetSeasons(id int) (seasons []Season, err error) {
 	if err != nil {
 		return
 	}
-	for k, v := range seasons {
-		if v.isScheduled() {
-			seasons[k].FirstTime, err = time.Parse("02/01/2006 15:04", v.FirstTimeRaw)
-			if err != nil {
-				return
-			}
-		}
-		seasons[k].Submitted, err = time.Parse("02/01/2006 15:04", v.SubmittedRaw)
+	for i := range seasons {
+		err = seasons[i].populateTimes()
 		if err != nil {
 			return
 		}
