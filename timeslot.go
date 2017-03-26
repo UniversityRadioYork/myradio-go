@@ -147,7 +147,7 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 }
 
 // isEmptySchedule tries to work out, from MyRadio schedule JSON, whether the schedule is empty.
-func isEmptySchedule(data *json.RawMessage) bool {
+func isEmptySchedule(data json.Marshaler) bool {
 	bs, err := data.MarshalJSON()
 	if err != nil {
 		// The logic later on in GetWeekSchedule should hit this same error, so handle it there.
