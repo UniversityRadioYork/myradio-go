@@ -27,6 +27,19 @@ type Show struct {
 	Id           uint64 `json:"id,omitempty"`
 }
 
+// populateShowTimes sets the times for the given Show given their raw values.
+func (s *Show) populateShowTimes() error {
+	s.StartTime = time.Unix(s.StartTimeRaw, 0)
+
+	timeint, err := strconv.ParseInt(s.EndTimeRaw, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	s.EndTime = time.Unix(timeint, 0)
+	return nil
+}
+
 // Timeslot contains information about a single timeslot in the URY schedule.
 // A timeslot is a single slice of time on the schedule, typically one hour long.
 type Timeslot struct {
@@ -88,14 +101,16 @@ func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
 	if err != nil {
 		return nil, err
 	}
-	currentAndNext.Current.StartTime = time.Unix(currentAndNext.Current.StartTimeRaw, 0)
-	if timeint, err := strconv.ParseInt(currentAndNext.Current.EndTimeRaw, 10, 64); err != nil {
-		currentAndNext.Current.EndTime = time.Unix(timeint, 0)
+	
+	err = currentAndNext.Current.populateShowTimes()
+	if err != nil {
+		return nil, err
 	}
-	currentAndNext.Next.StartTime = time.Unix(currentAndNext.Next.StartTimeRaw, 0)
-	if timeint, err := strconv.ParseInt(currentAndNext.Next.EndTimeRaw, 10, 64); err != nil {
-		currentAndNext.Next.EndTime = time.Unix(timeint, 0)
+	err = currentAndNext.Next.populateShowTimes()
+	if err != nil {
+		return nil, err
 	}
+
 	return &currentAndNext, nil
 }
 
