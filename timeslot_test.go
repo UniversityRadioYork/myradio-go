@@ -18,7 +18,7 @@ func TestGetWeekScheduleZeroObject(t *testing.T) {
 
 // testGetWeekScheduleZero tests whether GetWeekSchedule handles empty schedules correctly.
 func testGetWeekScheduleZero(t *testing.T, zero []byte) {
-	expected := map[int][]myradio.Timeslot {
+	expected := map[int][]myradio.Timeslot{
 		1: {},
 		2: {},
 		3: {},

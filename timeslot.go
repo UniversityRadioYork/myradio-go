@@ -90,16 +90,11 @@ type TracklistItem struct {
 // GetCurrentAndNext gets the current and next shows at the time of the call.
 // This consumes one API request.
 func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
-	data, aerr := s.apiRequest("/timeslot/currentandnext", []string{})
-	if aerr != nil {
-		return nil, aerr
-	}
-
 	var currentAndNext CurrentAndNext
-	if err := json.Unmarshal(*data, &currentAndNext); err != nil {
+	if err := s.apiRequestInto(&currentAndNext, "/timeslot/currentandnext", []string{}); err != nil {
 		return nil, err
 	}
-	
+
 	if err := currentAndNext.Current.populateShowTimes(); err != nil {
 		return nil, err
 	}
@@ -206,15 +201,9 @@ func destringTimeslots(stringyTimeslots map[string][]Timeslot) (map[int][]Timesl
 // GetTimeslot retrieves the timeslot with the given ID.
 // This consumes one API request.
 func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
-	var data *json.RawMessage
-	if data, err = s.apiRequest(fmt.Sprintf("/timeslot/%d", id), []string{}); err != nil {
+	if err = s.apiRequestInto(&timeslot, fmt.Sprintf("/timeslot/%d", id), []string{}); err != nil {
 		return
 	}
-
-	if err = json.Unmarshal(*data, &timeslot); err != nil {
-		return
-	}
-
 	err = timeslot.populateTimeslotTimes()
 	return
 }
@@ -222,11 +211,9 @@ func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
 // GetTrackListForTimeslot retrieves the tracklist for the timeslot with the given ID.
 // This consumes one API request.
 func (s *Session) GetTrackListForTimeslot(id int) (tracklist []TracklistItem, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/tracklistItem/tracklistfortimeslot/%d", id), []string{})
-	if err != nil {
+	if err = s.apiRequestInto(&tracklist, fmt.Sprintf("/tracklistItem/tracklistfortimeslot/%d", id), []string{}); err != nil {
 		return
 	}
-	err = json.Unmarshal(*data, &tracklist)
 	for k, v := range tracklist {
 		tracklist[k].Time = time.Unix(tracklist[k].TimeRaw, 0)
 		tracklist[k].StartTime, err = time.Parse("02/01/2006 15:04:05", v.StartTimeRaw)

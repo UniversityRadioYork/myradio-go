@@ -1,7 +1,6 @@
 package myradio
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -114,45 +113,21 @@ func (t *Track) IntroUsec() uint64 {
 // GetTrack tries to get the Track with the given ID.
 // Track IDs are unique, so we do not need the record ID.
 // This consumes one API request.
-func (s *Session) GetTrack(trackid uint64) (*Track, error) {
-	data, err := s.apiRequest(fmt.Sprintf("/track/%d", trackid), nil)
-	if err != nil {
-		return nil, err
-	}
-	track := new(Track)
-	err = json.Unmarshal(*data, track)
-	if err != nil {
-		return nil, err
-	}
-	return track, nil
+func (s *Session) GetTrack(trackid uint64) (track *Track, err error) {
+	err = s.apiRequestInto(&track, fmt.Sprintf("/track/%d", trackid), nil)
+	return
 }
 
 // GetTrackTitle tries to get the title of the track with the given ID.
 // This consumes one API request.
-func (s *Session) GetTrackTitle(trackid uint64) (string, error) {
-	data, err := s.apiRequest(fmt.Sprintf("/track/%d/title", trackid), nil)
-	if err != nil {
-		return "", err
-	}
-	var title string
-	err = json.Unmarshal(*data, &title)
-	if err != nil {
-		return "", err
-	}
-	return title, nil
+func (s *Session) GetTrackTitle(trackid uint64) (title string, err error) {
+	err = s.apiRequestInto(&title, fmt.Sprintf("/track/%d/title", trackid), nil)
+	return
 }
 
 // GetTrackAlbum tries to get the Album of the track with the given ID.
 // This consumes one API request.
-func (s *Session) GetTrackAlbum(trackid uint64) (*Album, error) {
-	data, err := s.apiRequest(fmt.Sprintf("/track/%d/album", trackid), nil)
-	if err != nil {
-		return nil, err
-	}
-	album := new(Album)
-	err = json.Unmarshal(*data, album)
-	if err != nil {
-		return nil, err
-	}
-	return album, nil
+func (s *Session) GetTrackAlbum(trackid uint64) (album *Album, err error) {
+	err = s.apiRequestInto(&album, fmt.Sprintf("/track/%d/album", trackid), nil)
+	return
 }

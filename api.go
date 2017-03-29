@@ -122,3 +122,13 @@ func (s *Session) apiRequestWithParams(endpoint string, mixins []string, params 
 func (s *Session) apiRequest(endpoint string, mixins []string) (*json.RawMessage, error) {
 	return s.apiRequestWithParams(endpoint, mixins, map[string][]string{})
 }
+
+// apiRequestInto conducts a GET request without custom parameters, and marshals the result directly into v.
+func (s *Session) apiRequestInto(v interface{}, endpoint string, mixins []string) error {
+	data, aerr := s.apiRequest(endpoint, mixins)
+	if aerr != nil {
+		return aerr
+	}
+
+	return json.Unmarshal(*data, v)
+}
