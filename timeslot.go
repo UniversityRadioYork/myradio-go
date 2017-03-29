@@ -59,8 +59,7 @@ type Timeslot struct {
 // populateTimeslotTimes sets the times for the given Timeslot given their raw values.
 func (t *Timeslot) populateTimeslotTimes() (err error) {
 	// Remember: a Timeslot is a supertype of Season.
-	err = t.populateSeasonTimes()
-	if err != nil {
+	if err = t.populateSeasonTimes(); err != nil {
 		return
 	}
 
@@ -91,23 +90,21 @@ type TracklistItem struct {
 // GetCurrentAndNext gets the current and next shows at the time of the call.
 // This consumes one API request.
 func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
-	data, err := s.apiRequest("/timeslot/currentandnext", []string{})
-	if err != nil {
-		return nil, err
+	data, aerr := s.apiRequest("/timeslot/currentandnext", []string{})
+	if aerr != nil {
+		return nil, aerr
 	}
 
 	var currentAndNext CurrentAndNext
-	err = json.Unmarshal(*data, &currentAndNext)
-	if err != nil {
+	if err := json.Unmarshal(*data, &currentAndNext); err != nil {
 		return nil, err
 	}
 	
-	err = currentAndNext.Current.populateShowTimes()
-	if err != nil {
+	if err := currentAndNext.Current.populateShowTimes(); err != nil {
 		return nil, err
 	}
-	err = currentAndNext.Next.populateShowTimes()
-	if err != nil {
+
+	if err := currentAndNext.Next.populateShowTimes(); err != nil {
 		return nil, err
 	}
 
@@ -130,9 +127,9 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 		return nil, fmt.Errorf("week %d is not within the ISO range 1..53", week)
 	}
 
-	data, err := s.apiRequestWithParams(fmt.Sprintf("/timeslot/weekschedule/%d", week), []string{}, map[string][]string{"year": {strconv.Itoa(year)}})
-	if err != nil {
-		return nil, err
+	data, aerr := s.apiRequestWithParams(fmt.Sprintf("/timeslot/weekschedule/%d", week), []string{}, map[string][]string{"year": {strconv.Itoa(year)}})
+	if aerr != nil {
+		return nil, aerr
 	}
 
 	// MyRadio responds in a different way when the schedule is empty, so we need to catch that.
@@ -153,9 +150,8 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 	// These timeslots start from "1" (Monday) and go up to "7" (Sunday).
 	// Note that this is different from Go's view of the week (0 = Sunday, 1 = Monday)!
 	stringyTimeslots := make(map[string][]Timeslot)
-	err = json.Unmarshal(*data, &stringyTimeslots)
-	if err != nil {
-		return nil, err
+	if jerr := json.Unmarshal(*data, &stringyTimeslots); jerr != nil {
+		return nil, jerr
 	}
 
 	return destringTimeslots(stringyTimeslots)
@@ -192,14 +188,13 @@ func isEmptySchedule(data json.Marshaler) bool {
 func destringTimeslots(stringyTimeslots map[string][]Timeslot) (map[int][]Timeslot, error) {
 	timeslots := make(map[int][]Timeslot)
 	for sday, ts := range stringyTimeslots {
-		day, err := strconv.Atoi(sday)
-		if err != nil {
-			return nil, err
+		day, derr := strconv.Atoi(sday)
+		if derr != nil {
+			return nil, derr
 		}
 		for i := range ts {
-			err = ts[i].populateTimeslotTimes()
-			if err != nil {
-				return nil, err
+			if terr := ts[i].populateTimeslotTimes(); terr != nil {
+				return nil, terr
 			}
 		}
 		timeslots[day] = ts
@@ -211,18 +206,16 @@ func destringTimeslots(stringyTimeslots map[string][]Timeslot) (map[int][]Timesl
 // GetTimeslot retrieves the timeslot with the given ID.
 // This consumes one API request.
 func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/timeslot/%d", id), []string{})
-	if err != nil {
+	var data *json.RawMessage
+	if data, err = s.apiRequest(fmt.Sprintf("/timeslot/%d", id), []string{}); err != nil {
 		return
 	}
-	err = json.Unmarshal(*data, &timeslot)
-	if err != nil {
+
+	if err = json.Unmarshal(*data, &timeslot); err != nil {
 		return
 	}
+
 	err = timeslot.populateTimeslotTimes()
-	if err != nil {
-		return
-	}
 	return
 }
 
