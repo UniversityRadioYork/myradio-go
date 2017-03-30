@@ -6,18 +6,9 @@ import (
 	"testing"
 )
 
-// TestGetWeekScheduleZeroArray tests whether GetWeekSchedule handles [] correctly.
-func TestGetWeekScheduleZeroArray(t *testing.T) {
-	testGetWeekScheduleZero(t, []byte("[]"))
-}
-
-// TestGetWeekScheduleZeroObject tests whether GetWeekSchedule handles {} correctly.
-func TestGetWeekScheduleZeroObject(t *testing.T) {
-	testGetWeekScheduleZero(t, []byte("{}"))
-}
 
 // testGetWeekScheduleZero tests whether GetWeekSchedule handles empty schedules correctly.
-func testGetWeekScheduleZero(t *testing.T, zero []byte) {
+func testGetWeekScheduleZero(t *testing.T) {
 	expected := map[int][]myradio.Timeslot{
 		1: {},
 		2: {},
@@ -28,17 +19,20 @@ func testGetWeekScheduleZero(t *testing.T, zero []byte) {
 		7: {},
 	}
 
-	session, err := myradio.MockSession(zero)
-	if err != nil {
-		t.Error(err)
-	}
+	zeroes := [][]byte{ []byte("[]"), []byte("{}") }
+	for _, zero := range zeroes{
+		session, err := myradio.MockSession(zero)
+		if err != nil {
+			t.Error(err)
+		}
 
-	schedule, err := session.GetWeekSchedule(0, 1)
-	if err != nil {
-		t.Error(err)
-	}
+		schedule, err := session.GetWeekSchedule(0, 1)
+		if err != nil {
+			t.Error(err)
+		}
 
-	if !reflect.DeepEqual(schedule, expected) {
-		t.Errorf("expected:\n%v\n\ngot:\n%v", expected, schedule)
+		if !reflect.DeepEqual(schedule, expected) {
+			t.Error("expected:", expected, "got:", schedule)
+		}
 	}
 }
