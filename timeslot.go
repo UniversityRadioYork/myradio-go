@@ -27,9 +27,33 @@ type Show struct {
 	Id           uint64 `json:"id,omitempty"`
 }
 
+// IsZero determines whether the Show is the zero value.
+// This is useful for checking when, for example, there is no next show in a CurrentAndNext.
+func (s *Show) IsZero() bool {
+	// We could use reflect.DeepEqual(Show{}) here,
+	// but an easier way is to check a field that will _never_ be its zero value.
+	// Assume that EndTimeRaw will always be a number, or "The End of Time", not "".
+	// This assumption will eventually go stale!
+	return s.EndTimeRaw == ""
+}
+
+// Ends determines whether the Show has a defined end time.
+func (s *Show) Ends() bool {
+	// populateShowTimes() will define EndTime as zero if there isn't one.
+	return s.EndTime.IsZero()
+}
+
 // populateShowTimes sets the times for the given Show given their raw values.
 func (s *Show) populateShowTimes() error {
 	s.StartTime = time.Unix(s.StartTimeRaw, 0)
+
+	// As mentioned above, sometimes EndTimeRaw is "The End of Time".
+	// This is a known MyRadio-ism!
+	if s.EndTimeRaw == "The End of Time" {
+		// Whatever this is sent to should give 'true' for Show.Ends().
+		s.EndTime = time.Time{}
+		return nil
+	}
 
 	timeint, err := strconv.ParseInt(s.EndTimeRaw, 10, 64)
 	if err != nil {
@@ -89,21 +113,23 @@ type TracklistItem struct {
 
 // GetCurrentAndNext gets the current and next shows at the time of the call.
 // This consumes one API request.
-func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
-	var currentAndNext CurrentAndNext
-	if err := s.apiRequestInto(&currentAndNext, "/timeslot/currentandnext", []string{}); err != nil {
-		return nil, err
+func (s *Session) GetCurrentAndNext() (can *CurrentAndNext, err error) {
+	if err = s.apiRequestInto(&can, "/timeslot/currentandnext", []string{}); err != nil {
+		return
 	}
 
-	if err := currentAndNext.Current.populateShowTimes(); err != nil {
-		return nil, err
+	if err = can.Current.populateShowTimes(); err != nil {
+		return
 	}
 
-	if err := currentAndNext.Next.populateShowTimes(); err != nil {
-		return nil, err
+	// Sometimes, we only get a Current, not a Next.
+	// Don't try populate times on a show that doesn't exist.
+	if can.Next.IsZero() {
+		return
 	}
+	err = can.Next.populateShowTimes()
 
-	return &currentAndNext, nil
+	return
 }
 
 // GetWeekSchedule gets the weekly schedule for ISO 8601 week week of year year.
