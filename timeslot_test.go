@@ -18,12 +18,12 @@ func testCanEntryZero(t *testing.T) {
 
 // testCanEntryEnds tests whether a CurrentAndNext entry returns something sensible for Ends.
 func testCanEntryEnds(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		t time.Time
 		e bool
 	}{
-		{ t: time.Time{}, e: false },
-		{ t: time.Date(2009, time.April, 13, 11, 11, 11, 0, time.UTC), e: true },
+		{t: time.Time{}, e: false},
+		{t: time.Date(2009, time.April, 13, 11, 11, 11, 0, time.UTC), e: true},
 	}
 
 	for _, c := range cases {
@@ -47,8 +47,8 @@ func testGetWeekScheduleZero(t *testing.T) {
 		7: {},
 	}
 
-	zeroes := [][]byte{ []byte("[]"), []byte("{}") }
-	for _, zero := range zeroes{
+	zeroes := [][]byte{[]byte("[]"), []byte("{}")}
+	for _, zero := range zeroes {
 		session, err := myradio.MockSession(zero)
 		if err != nil {
 			t.Error(err)
