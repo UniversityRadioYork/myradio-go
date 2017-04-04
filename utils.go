@@ -1,6 +1,7 @@
 package myradio
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"strconv"
@@ -24,6 +25,11 @@ func parseDuration(value string) (dur time.Duration, err error) {
 	// However, while convenient, this fails for durations that don't 'look' like times,
 	// eg. anything over 23:59:60.
 
+	if len(value) == 0 {
+		err = errors.New("parseDuration: duration string empty")
+		return
+	}
+
 	vs := strings.Split(value, ":")
 	if len(vs) != 3 {
 		err = fmt.Errorf("parseDuration: '%s' has %d sections but should have 3", value, len(vs))
@@ -40,6 +46,7 @@ func parseDuration(value string) (dur time.Duration, err error) {
 
 	// Save us from repeating the same processing logic 3 times, at the cost of some efficiency when we fail.
 	parseBit := func(bit string, min, max int64) (val int64) {
+		// Short-circuit if previous parseBits failed.
 		if err != nil {
 			return
 		}
