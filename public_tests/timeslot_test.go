@@ -1,4 +1,4 @@
-package myradio_test
+package public_tests
 
 import (
 	myradio "github.com/UniversityRadioYork/myradio-go"
