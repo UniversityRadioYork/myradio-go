@@ -114,20 +114,20 @@ func (t *Track) IntroUsec() uint64 {
 // Track IDs are unique, so we do not need the record ID.
 // This consumes one API request.
 func (s *Session) GetTrack(trackid uint64) (track *Track, err error) {
-	err = s.get(fmt.Sprintf("/track/%d", trackid)).into(&track)
+	err = s.getf("/track/%d", trackid).into(&track)
 	return
 }
 
 // GetTrackTitle tries to get the title of the track with the given ID.
 // This consumes one API request.
 func (s *Session) GetTrackTitle(trackid uint64) (title string, err error) {
-	err = s.get(fmt.Sprintf("/track/%d/title", trackid)).into(&title)
+	err = s.getf("/track/%d/title", trackid).into(&title)
 	return
 }
 
 // GetTrackAlbum tries to get the Album of the track with the given ID.
 // This consumes one API request.
 func (s *Session) GetTrackAlbum(trackid uint64) (album *Album, err error) {
-	err = s.get(fmt.Sprintf("/track/%d/album", trackid)).into(&album)
+	err = s.getf("/track/%d/album", trackid).into(&album)
 	return
 }

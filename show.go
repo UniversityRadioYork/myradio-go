@@ -1,9 +1,6 @@
 package myradio
 
-import (
-	"fmt"
-	"net/url"
-)
+import "net/url"
 
 // Credit represents a show credit associating a user with a show.
 type Credit struct {
@@ -40,23 +37,21 @@ type Link struct {
 // GetSearchMeta retrieves all shows whose metadata matches a given search term.
 // This consumes one API request.
 func (s *Session) GetSearchMeta(term string) (shows []ShowMeta, err error) {
-	q := url.QueryEscape(term)
-
-	err = s.get(fmt.Sprintf("/show/searchmeta/%s", q)).into(&shows)
+	err = s.getf("/show/searchmeta/%s", url.QueryEscape(term)).into(&shows)
 	return
 }
 
 // GetShow retrieves the show with the given ID.
 // This consumes one API request.
 func (s *Session) GetShow(id int) (show *ShowMeta, err error) {
-	err = s.get(fmt.Sprintf("/show/%d", id)).into(&show)
+	err = s.getf("/show/%d", id).into(&show)
 	return
 }
 
 // GetSeasons retrieves the seasons of the show with the given ID.
 // This consumes one API request.
 func (s *Session) GetSeasons(id int) (seasons []Season, err error) {
-	if err = s.get(fmt.Sprintf("/show/%d/allseasons", id)).into(&seasons); err != nil {
+	if err = s.getf("/show/%d/allseasons", id).into(&seasons); err != nil {
 		return
 	}
 

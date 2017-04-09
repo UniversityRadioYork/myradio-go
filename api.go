@@ -157,3 +157,8 @@ func (s *Session) get(endpoint string) *request {
 	r.endpoint = endpoint
 	return &r
 }
+
+// getf constructs a request whose endpoint is defined by a formatted string.
+func (s *Session) getf(format string, params ...interface{}) *request {
+	return s.get(fmt.Sprintf(format, params...))
+}

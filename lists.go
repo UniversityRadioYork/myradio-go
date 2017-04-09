@@ -1,7 +1,5 @@
 package myradio
 
-import "fmt"
-
 // List represents a mailing list.
 type List struct {
 	Listid     int
@@ -20,6 +18,6 @@ func (s *Session) GetAllLists() (lists []List, err error) {
 // GetUsers retrieves all users subscribed to a given mailing list.
 // This consumes one API request.
 func (s *Session) GetUsers(l *List) (users []User, err error) {
-	err = s.get(fmt.Sprintf("/list/%d/members", l.Listid)).mixin("personal_data").into(&users)
+	err = s.getf("/list/%d/members", l.Listid).mixin("personal_data").into(&users)
 	return
 }

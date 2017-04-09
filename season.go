@@ -1,9 +1,6 @@
 package myradio
 
-import (
-	"fmt"
-	"time"
-)
+import "time"
 
 // Season represents a season in the MyRadio schedule.
 // A MyRadio season contains timeslots.
@@ -43,7 +40,7 @@ func (s *Season) populateSeasonTimes() (err error) {
 // GetSeason retrieves the season with the given ID.
 // This consumes one API request.
 func (s *Session) GetSeason(id int) (season Season, err error) {
-	if err = s.get(fmt.Sprintf("/season/%d/", id)).into(&season); err != nil {
+	if err = s.getf("/season/%d/", id).into(&season); err != nil {
 		return
 	}
 
@@ -55,7 +52,7 @@ func (s *Session) GetSeason(id int) (season Season, err error) {
 // GetTimeslotsForSeason retrieves all timeslots for the season with the given ID.
 // This consumes one API request.
 func (s *Session) GetTimeslotsForSeason(id int) (timeslots []Timeslot, err error) {
-	if err = s.get(fmt.Sprintf("/season/%d/alltimeslots/", id)).into(&timeslots); err != nil {
+	if err = s.getf("/season/%d/alltimeslots/", id).into(&timeslots); err != nil {
 		return
 	}
 
