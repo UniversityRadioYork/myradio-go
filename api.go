@@ -113,22 +113,47 @@ func MockSession(message []byte) (*Session, error) {
 	}, nil
 }
 
-// apiRequestWithParams conducts a GET request with custom parameters.
-func (s *Session) apiRequestWithParams(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error) {
-	return s.requester.request(endpoint, mixins, params)
+// Struct request represents an API request being built.
+type request struct {
+	requester apiRequester
+	endpoint  string
+	mixins    []string
+	params    map[string][]string
 }
 
-// apiRequest conducts a GET request without custom parameters.
-func (s *Session) apiRequest(endpoint string, mixins []string) (*json.RawMessage, error) {
-	return s.apiRequestWithParams(endpoint, mixins, map[string][]string{})
+// mixin adds one or more mixins to an API request.
+// It returns a pointer to the original request.
+func (r *request) mixin(ms ...string) *request {
+	r.mixins = append(r.mixins, ms...)
+	return r
 }
 
-// apiRequestInto conducts a GET request without custom parameters, and marshals the result directly into v.
-func (s *Session) apiRequestInto(v interface{}, endpoint string, mixins []string) error {
-	data, aerr := s.apiRequest(endpoint, mixins)
+// param adds a parameter with key k and values v to an API request.
+// It returns a pointer to the original request.
+func (r *request) param(k string, vs ...string) *request {
+	r.params[k] = vs
+	return r
+}
+
+// do runs a request and returns the raw JSON and error.
+func (r *request) do() (*json.RawMessage, error) {
+	return r.requester.request(r.endpoint, r.mixins, r.params)
+}
+
+// into runs a request and tries to unmarshal the result into in.
+func (r *request) into(in interface{}) error {
+	data, aerr := r.do()
 	if aerr != nil {
 		return aerr
 	}
 
-	return json.Unmarshal(*data, v)
+	return json.Unmarshal(*data, in)
+}
+
+// get constructs a new request for the given endpoint.
+func (s *Session) get(endpoint string) *request {
+	r := request{}
+	r.requester = s.requester
+	r.endpoint = endpoint
+	return &r
 }

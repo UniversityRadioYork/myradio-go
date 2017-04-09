@@ -18,6 +18,6 @@ type Alias struct {
 // It takes a list of additional MyRadio API mixins to use when retrieving the aliases.
 // This consumes one API request.
 func (s *Session) GetAllAliases(mixins []string) (aliases []Alias, err error) {
-	err = s.apiRequestInto(&aliases, "/alias/allaliases", mixins)
+	err = s.get("/alias/allaliases").mixin(mixins...).into(&aliases)
 	return
 }

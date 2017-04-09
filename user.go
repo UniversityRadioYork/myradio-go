@@ -45,23 +45,15 @@ type UserAlias struct {
 
 // GetUser retrieves the User with the given ID.
 // This consumes one API request.
-func (s *Session) GetUser(id int) (*User, error) {
-	data, err := s.apiRequest(fmt.Sprintf("/user/%d", id), []string{"personal_data"})
-	if err != nil {
-		return nil, err
-	}
-	var user User
-	err = json.Unmarshal(*data, &user)
-	if err != nil {
-		return nil, err
-	}
-	return &user, nil
+func (s *Session) GetUser(id int) (user *User, err error) {
+	err = s.get(fmt.Sprintf("/user/%d", id)).mixin("personal_data").into(&user)
+	return
 }
 
 // GetUserBio retrieves the biography of the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserBio(id int) (bio string, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/user/%d/bio/", id), []string{})
+	data, err := s.get(fmt.Sprintf("/user/%d/bio/", id)).do()
 	if err != nil {
 		return
 	}
@@ -76,18 +68,14 @@ func (s *Session) GetUserBio(id int) (bio string, err error) {
 // GetUserName retrieves the name of the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserName(id int) (name string, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/user/%d/name/", id), []string{})
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(*data, &name)
+	err = s.get(fmt.Sprintf("/user/%d/name/", id)).into(&name)
 	return
 }
 
 // GetUserProfilePhoto retrieves the profile photo of the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserProfilePhoto(id int) (profilephoto Photo, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/user/%d/profilephoto/", id), []string{})
+	data, err := s.get(fmt.Sprintf("/user/%d/profilephoto/", id)).do()
 	if err != nil {
 		return
 	}
@@ -106,11 +94,7 @@ func (s *Session) GetUserProfilePhoto(id int) (profilephoto Photo, err error) {
 // GetUserOfficerships retrieves all officerships held by the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserOfficerships(id int) (officerships []Officership, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/user/%d/officerships/", id), []string{})
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(*data, &officerships)
+	err = s.get(fmt.Sprintf("/user/%d/officerships/", id)).into(&officerships)
 	if err != nil {
 		return
 	}
@@ -134,23 +118,15 @@ func (s *Session) GetUserOfficerships(id int) (officerships []Officership, err e
 // GetUserShowCredits retrieves all show credits associated with the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserShowCredits(id int) (shows []ShowMeta, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/user/%d/shows/", id), []string{})
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(*data, &shows)
+	err = s.get(fmt.Sprintf("/user/%d/shows/", id)).into(&shows)
 	return
 }
 
 // GetUserAliases retrieves all aliases associated with the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserAliases() ([]UserAlias, error) {
-	data, err := s.apiRequest("/user/allaliases/", []string{})
-	if err != nil {
-		return nil, err
-	}
 	raw := [][]string{}
-	err = json.Unmarshal(*data, &raw)
+	err := s.get("/user/allaliases/").into(&raw)
 	if err != nil {
 		return nil, err
 	}

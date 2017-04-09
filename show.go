@@ -42,21 +42,21 @@ type Link struct {
 func (s *Session) GetSearchMeta(term string) (shows []ShowMeta, err error) {
 	q := url.QueryEscape(term)
 
-	err = s.apiRequestInto(&shows, fmt.Sprintf("/show/searchmeta/%s", q), []string{})
+	err = s.get(fmt.Sprintf("/show/searchmeta/%s", q)).into(&shows)
 	return
 }
 
 // GetShow retrieves the show with the given ID.
 // This consumes one API request.
 func (s *Session) GetShow(id int) (show *ShowMeta, err error) {
-	err = s.apiRequestInto(&show, fmt.Sprintf("/show/%d", id), []string{})
+	err = s.get(fmt.Sprintf("/show/%d", id)).into(&show)
 	return
 }
 
 // GetSeasons retrieves the seasons of the show with the given ID.
 // This consumes one API request.
 func (s *Session) GetSeasons(id int) (seasons []Season, err error) {
-	if err = s.apiRequestInto(&seasons, fmt.Sprintf("/show/%d/allseasons", id), []string{}); err != nil {
+	if err = s.get(fmt.Sprintf("/show/%d/allseasons", id)).into(&seasons); err != nil {
 		return
 	}
 

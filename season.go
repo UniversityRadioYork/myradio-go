@@ -43,7 +43,7 @@ func (s *Season) populateSeasonTimes() (err error) {
 // GetSeason retrieves the season with the given ID.
 // This consumes one API request.
 func (s *Session) GetSeason(id int) (season Season, err error) {
-	if err = s.apiRequestInto(&season, fmt.Sprintf("/season/%d/", id), []string{}); err != nil {
+	if err = s.get(fmt.Sprintf("/season/%d/", id)).into(&season); err != nil {
 		return
 	}
 
@@ -55,7 +55,7 @@ func (s *Session) GetSeason(id int) (season Season, err error) {
 // GetTimeslotsForSeason retrieves all timeslots for the season with the given ID.
 // This consumes one API request.
 func (s *Session) GetTimeslotsForSeason(id int) (timeslots []Timeslot, err error) {
-	if err = s.apiRequestInto(&timeslots, fmt.Sprintf("/season/%d/alltimeslots/", id), []string{}); err != nil {
+	if err = s.get(fmt.Sprintf("/season/%d/alltimeslots/", id)).into(&timeslots); err != nil {
 		return
 	}
 
@@ -72,7 +72,7 @@ func (s *Session) GetTimeslotsForSeason(id int) (timeslots []Timeslot, err error
 // GetAllSeasonsInLatestTerm gets all seasons in the most recent term.
 // This consumes one API request.
 func (s *Session) GetAllSeasonsInLatestTerm() (seasons []Season, err error) {
-	if err = s.apiRequestInto(&seasons, "/season/allseasonsinlatestterm/", []string{}); err != nil {
+	if err = s.get("/season/allseasonsinlatestterm/").into(&seasons); err != nil {
 		return
 	}
 

@@ -114,7 +114,7 @@ type TracklistItem struct {
 // GetCurrentAndNext gets the current and next shows at the time of the call.
 // This consumes one API request.
 func (s *Session) GetCurrentAndNext() (can *CurrentAndNext, err error) {
-	if err = s.apiRequestInto(&can, "/timeslot/currentandnext", []string{}); err != nil {
+	if err = s.get("/timeslot/currentandnext").into(&can); err != nil {
 		return
 	}
 
@@ -148,7 +148,7 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 		return nil, fmt.Errorf("week %d is not within the ISO range 1..53", week)
 	}
 
-	data, aerr := s.apiRequestWithParams(fmt.Sprintf("/timeslot/weekschedule/%d", week), []string{}, map[string][]string{"year": {strconv.Itoa(year)}})
+	data, aerr := s.get(fmt.Sprintf("/timeslot/weekschedule/%d", week)).param("year", strconv.Itoa(year)).do()
 	if aerr != nil {
 		return nil, aerr
 	}
@@ -227,7 +227,7 @@ func destringTimeslots(stringyTimeslots map[string][]Timeslot) (map[int][]Timesl
 // GetTimeslot retrieves the timeslot with the given ID.
 // This consumes one API request.
 func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
-	if err = s.apiRequestInto(&timeslot, fmt.Sprintf("/timeslot/%d", id), []string{}); err != nil {
+	if err = s.get(fmt.Sprintf("/timeslot/%d", id)).into(&timeslot); err != nil {
 		return
 	}
 	err = timeslot.populateTimeslotTimes()
@@ -237,7 +237,7 @@ func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
 // GetTrackListForTimeslot retrieves the tracklist for the timeslot with the given ID.
 // This consumes one API request.
 func (s *Session) GetTrackListForTimeslot(id int) (tracklist []TracklistItem, err error) {
-	if err = s.apiRequestInto(&tracklist, fmt.Sprintf("/tracklistItem/tracklistfortimeslot/%d", id), []string{}); err != nil {
+	if err = s.get(fmt.Sprintf("/tracklistItem/tracklistfortimeslot/%d", id)).into(&tracklist); err != nil {
 		return
 	}
 	for k, v := range tracklist {
