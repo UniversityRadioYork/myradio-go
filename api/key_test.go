@@ -1,11 +1,8 @@
-package myradio
+package api
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestGetApiKeyFromFile(t *testing.T) {
-
 	var tests = []struct{ Path, Expected string }{
 		{"testdata/.myradio.key", "THIS-IS-A-TEST-KEY-THAT-WILL-NOT-WORK"},
 		{"testdata/.linebreaks.key", "THIS-KEY-HAS-SOME-LINE-BREAKS"},
@@ -16,8 +13,7 @@ func TestGetApiKeyFromFile(t *testing.T) {
 	for _, test := range tests {
 		k := getAPIKeyFromFile(test.Path)
 		if k != test.Expected {
-			t.Fail()
+			t.Fatal("expected:", test.Expected, "got:", k)
 		}
 	}
-
 }

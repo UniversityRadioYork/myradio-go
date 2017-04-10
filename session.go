@@ -40,3 +40,13 @@ func (s *Session) get(endpoint string) *api.Request {
 func (s *Session) getf(format string, params ...interface{}) *api.Request {
 	return s.get(fmt.Sprintf(format, params...))
 }
+
+// NewSessionFromKeyFile tries to open a Session with the key from an API key file.
+func NewSessionFromKeyFile() (*Session, error) {
+	apikey, err := api.GetAPIKey()
+	if err != nil {
+		return nil, err
+	}
+
+	return NewSession(apikey)
+}

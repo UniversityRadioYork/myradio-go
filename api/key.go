@@ -1,4 +1,4 @@
-package myradio
+package api
 
 import (
 	"errors"
@@ -28,8 +28,14 @@ var KeyFiles = []string{
 	"/usr/local/etc/myradio.key",
 }
 
-// getAPIKey tries to get an API key from all possible sources.
-func getAPIKey() (apikey string, err error) {
+// GetAPIKey tries to get an API key from all possible sources.
+// This tries the following paths for a file containing one line (the API key):
+//   1) Whichever path is set in the environment variable `MYRADIOKEYFILE`;
+//   2) `.myradio.key`, in the current directory;
+//   3) `.myradio.key`, in the user's home directory;
+//   4) `/etc/myradio.key`;
+//   5) `/usr/local/etc/myradio.key`.`
+func GetAPIKey() (apikey string, err error) {
 	apikey, err = getAPIKeyEnv()
 	if err != nil {
 		apikey, err = getAPIKeyFile()
@@ -72,18 +78,3 @@ func getAPIKeyFromFile(path string) string {
 	return strings.TrimSpace(s)
 }
 
-// NewSessionFromKeyFile tries to open a Session with the key from an API key file.
-// This tries the following paths for a file containing one line (the API key):
-//   1) Whichever path is set in the environment variable `MYRADIOKEYFILE`;
-//   2) `.myradio.key`, in the current directory;
-//   3) `.myradio.key`, in the user's home directory;
-//   4) `/etc/myradio.key`;
-//   5) `/usr/local/etc/myradio.key`.
-func NewSessionFromKeyFile() (*Session, error) {
-	apikey, err := getAPIKey()
-	if err != nil {
-		return nil, err
-	}
-
-	return NewSession(apikey)
-}
