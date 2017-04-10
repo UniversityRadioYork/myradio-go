@@ -11,13 +11,13 @@ type List struct {
 // GetAllLists retrieves all mailing lists in the MyRadio system.
 // This consumes one API request.
 func (s *Session) GetAllLists() (lists []List, err error) {
-	err = s.get("/list/alllists").into(&lists)
+	err = s.get("/list/alllists").Into(&lists)
 	return
 }
 
 // GetUsers retrieves all users subscribed to a given mailing list.
 // This consumes one API request.
 func (s *Session) GetUsers(l *List) (users []User, err error) {
-	err = s.getf("/list/%d/members", l.Listid).mixin("personal_data").into(&users)
+	err = s.getf("/list/%d/members", l.Listid).Mixin("personal_data").Into(&users)
 	return
 }

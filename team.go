@@ -45,14 +45,14 @@ type HeadPosition struct {
 // GetCurrentTeams retrieves all teams inside the station committee.
 // This consumes one API request.
 func (s *Session) GetCurrentTeams() (teams []Team, err error) {
-	err = s.get("/team/currentteams/").into(&teams)
+	err = s.get("/team/currentteams/").Into(&teams)
 	return
 }
 
 // GetTeamWithOfficers retrieves a team record with officer information for the given team name.
 // This consumes one API request.
 func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
-	if err = s.getf("/team/byalias/%s", teamName).mixin("officers").into(&team); err != nil {
+	if err = s.getf("/team/byalias/%s", teamName).Mixin("officers").Into(&team); err != nil {
 		return
 	}
 
@@ -67,7 +67,7 @@ func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
 // The amount of detail can be controlled using MyRadio mixins.
 // This consumes one API request.
 func (s *Session) GetTeamHeadPositions(id int, mixins []string) (head []HeadPosition, err error) {
-	if err = s.getf("/team/%d/headpositions").mixin(mixins...).into(&head); err != nil {
+	if err = s.getf("/team/%d/headpositions").Mixin(mixins...).Into(&head); err != nil {
 		return
 	}
 

@@ -45,14 +45,14 @@ type UserAlias struct {
 // GetUser retrieves the User with the given ID.
 // This consumes one API request.
 func (s *Session) GetUser(id int) (user *User, err error) {
-	err = s.getf("/user/%d", id).mixin("personal_data").into(&user)
+	err = s.getf("/user/%d", id).Mixin("personal_data").Into(&user)
 	return
 }
 
 // GetUserBio retrieves the biography of the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserBio(id int) (bio string, err error) {
-	data, err := s.getf("/user/%d/bio/", id).do()
+	data, err := s.getf("/user/%d/bio/", id).Do()
 	if err != nil {
 		return
 	}
@@ -67,14 +67,14 @@ func (s *Session) GetUserBio(id int) (bio string, err error) {
 // GetUserName retrieves the name of the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserName(id int) (name string, err error) {
-	err = s.getf("/user/%d/name/", id).into(&name)
+	err = s.getf("/user/%d/name/", id).Into(&name)
 	return
 }
 
 // GetUserProfilePhoto retrieves the profile photo of the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserProfilePhoto(id int) (profilephoto Photo, err error) {
-	data, err := s.getf("/user/%d/profilephoto/", id).do()
+	data, err := s.getf("/user/%d/profilephoto/", id).Do()
 	if err != nil {
 		return
 	}
@@ -93,7 +93,7 @@ func (s *Session) GetUserProfilePhoto(id int) (profilephoto Photo, err error) {
 // GetUserOfficerships retrieves all officerships held by the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserOfficerships(id int) (officerships []Officership, err error) {
-	err = s.getf("/user/%d/officerships/", id).into(&officerships)
+	err = s.getf("/user/%d/officerships/", id).Into(&officerships)
 	if err != nil {
 		return
 	}
@@ -117,7 +117,7 @@ func (s *Session) GetUserOfficerships(id int) (officerships []Officership, err e
 // GetUserShowCredits retrieves all show credits associated with the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserShowCredits(id int) (shows []ShowMeta, err error) {
-	err = s.getf("/user/%d/shows/", id).into(&shows)
+	err = s.getf("/user/%d/shows/", id).Into(&shows)
 	return
 }
 
@@ -125,7 +125,7 @@ func (s *Session) GetUserShowCredits(id int) (shows []ShowMeta, err error) {
 // This consumes one API request.
 func (s *Session) GetUserAliases() ([]UserAlias, error) {
 	raw := [][]string{}
-	err := s.get("/user/allaliases/").into(&raw)
+	err := s.get("/user/allaliases/").Into(&raw)
 	if err != nil {
 		return nil, err
 	}
