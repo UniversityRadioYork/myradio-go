@@ -2,7 +2,6 @@ package myradio
 
 import "encoding/json"
 
-
 // Alias represents a mail alias.
 type Alias struct {
 	Id           int `json:"alias_id"`

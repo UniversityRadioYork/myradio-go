@@ -3,8 +3,8 @@ package myradio
 import (
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"github.com/UniversityRadioYork/myradio-go/api"
+	"net/url"
 )
 
 // Session represents an open API session.

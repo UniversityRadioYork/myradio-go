@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/UniversityRadioYork/myradio-go/api"
 	"log"
 	"net/url"
 	"os"
-	"github.com/UniversityRadioYork/myradio-go/api"
 )
 
 func usage() {
@@ -25,7 +25,7 @@ func main() {
 		usage()
 		return
 	}
-	
+
 	k, err := api.GetAPIKey()
 	if err != nil {
 		log.Fatal(err)
