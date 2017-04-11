@@ -16,8 +16,8 @@ import (
 
 // Requester is the type of anything that can handle an API request.
 type Requester interface {
-	// Request sends out a full API request.
-	Request(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error)
+	// Do fulfils an API request.
+	Do(r *Request) (*json.RawMessage, error)
 }
 
 // authedRequester answers API requests by making an authed API call.
@@ -34,28 +34,22 @@ func NewRequester(apikey string, url url.URL) Requester {
 	}
 }
 
-// response provides the base structure of MyRadio API responses.
-type response struct {
-	Status  string
-	Payload *json.RawMessage
-}
-
-// Request fulfils an API request by making an authed API call.
-func (s *authedRequester) Request(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error) {
+// Do fulfils an API request.
+func (s *authedRequester) Do(r *Request) (*json.RawMessage, error) {
 	urlParams := url.Values{
 		"api_key": []string{s.apikey},
 	}
-	if len(mixins) > 0 {
-		urlParams.Add("mixins", strings.Join(mixins, ","))
+	if len(r.mixins) > 0 {
+		urlParams.Add("mixins", strings.Join(r.mixins, ","))
 	}
-	for k, vs := range params {
+	for k, vs := range r.params {
 		for _, v := range vs {
 			urlParams.Add(k, v)
 		}
 	}
 
 	theurl := s.baseurl
-	theurl.Path += endpoint
+	theurl.Path += r.endpoint
 	theurl.RawQuery = urlParams.Encode()
 	req, err := http.NewRequest("GET", theurl.String(), nil)
 	if err != nil {
@@ -67,20 +61,23 @@ func (s *authedRequester) Request(endpoint string, mixins []string, params map[s
 		return nil, err
 	}
 	if res.StatusCode != 200 {
-		return nil, fmt.Errorf(endpoint + fmt.Sprintf(" Not ok: HTTP %d", res.StatusCode))
+		return nil, fmt.Errorf(r.endpoint + fmt.Sprintf(" Not ok: HTTP %d", res.StatusCode))
 	}
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
 	}
-	var response response
+	var response struct {
+		Status  string
+		Payload *json.RawMessage
+	}
 	err = json.Unmarshal(data, &response)
 	if err != nil {
 		return nil, err
 	}
 	if response.Status != "OK" {
-		return nil, fmt.Errorf(endpoint + fmt.Sprintf(" Response not OK: %v", response))
+		return nil, fmt.Errorf(r.endpoint + fmt.Sprintf(" Response not OK: %v", response))
 	}
 	return response.Payload, nil
 }
@@ -95,13 +92,13 @@ func MockRequester(message *json.RawMessage) Requester {
 	return &mockRequester{message: message}
 }
 
-// Request pretends to fulfil an API request, but actually returns the mockRequester's stock response.
-func (s *mockRequester) Request(endpoint string, mixins []string, params map[string][]string) (*json.RawMessage, error) {
+// Do pretends to fulfil an API request, but actually returns the mockRequester's stock response.
+func (s *mockRequester) Do(r *Request) (*json.RawMessage, error) {
 	return s.message, nil
 }
 
 
-// Struct Request represents an API request being built.
+// Request represents an API request being built.
 type Request struct {
 	requester Requester
 	endpoint  string
@@ -125,7 +122,7 @@ func (r *Request) Param(k string, vs ...string) *Request {
 
 // Do runs a request and returns the raw JSON and error.
 func (r *Request) Do() (*json.RawMessage, error) {
-	return r.requester.Request(r.endpoint, r.mixins, r.params)
+	return r.requester.Do(r)
 }
 
 // into runs a request and tries to unmarshal the result into in.
