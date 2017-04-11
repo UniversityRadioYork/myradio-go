@@ -1,3 +1,8 @@
+// Package api exposes a low-level interface to the MyRadio API.
+//
+// It exposes the Requester interface for types that represent
+// connections to the API, methods for constructing Requesters, and
+// functions and methods for using Requesters to make requests.
 package api
 
 import (
