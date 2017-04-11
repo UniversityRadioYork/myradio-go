@@ -19,9 +19,8 @@ var (
 	ErrNoKeyFile = errors.New("couldn't find any API key file")
 )
 
-// KeyFiles is the list of possible places to
-// search for a urydb file.
-var KeyFiles = []string{
+// keyFiles is the list of possible places to search for a myradio.key file.
+var keyFiles = []string{
 	".myradio.key",
 	"${HOME}/.myradio.key",
 	"/etc/myradio.key",
@@ -54,7 +53,7 @@ func getAPIKeyEnv() (apikey string, err error) {
 
 // getAPIKeyFile tries to get an API key from a known file.
 func getAPIKeyFile() (apikey string, err error) {
-	for _, rawPath := range KeyFiles {
+	for _, rawPath := range keyFiles {
 		apikey = getAPIKeyFromFile(rawPath)
 		if apikey != "" {
 			return
