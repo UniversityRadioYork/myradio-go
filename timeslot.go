@@ -1,10 +1,11 @@
 package myradio
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/UniversityRadioYork/myradio-go/api"
 )
 
 // CurrentAndNext stores a pair of current and next show.
@@ -148,14 +149,13 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 		return nil, fmt.Errorf("week %d is not within the ISO range 1..53", week)
 	}
 
-	data, aerr := s.getf("/timeslot/weekschedule/%d", week).Param("year", strconv.Itoa(year)).Do()
-	if aerr != nil {
-		return nil, aerr
-	}
+	rq := api.Getf("/timeslot/weekschedule/%d", week)
+	rq.Params["year"] = []string{strconv.Itoa(year)}
+	rs := s.do(rq)
 
-	// MyRadio responds in a different way when the schedule is empty, so we need to catch that.
+	// MyRadio responds with an empty object when the schedule is empty, so we need to catch that.
 	// See https://github.com/UniversityRadioYork/MyRadio/issues/665 for details.
-	if isEmptySchedule(data) {
+	if rs.IsEmpty() {
 		return map[int][]Timeslot{
 			1: {},
 			2: {},
@@ -171,36 +171,11 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 	// These timeslots start from "1" (Monday) and go up to "7" (Sunday).
 	// Note that this is different from Go's view of the week (0 = Sunday, 1 = Monday)!
 	stringyTimeslots := make(map[string][]Timeslot)
-	if jerr := json.Unmarshal(*data, &stringyTimeslots); jerr != nil {
-		return nil, jerr
+	if ierr := rs.Into(&stringyTimeslots); ierr != nil {
+		return nil, ierr
 	}
 
 	return destringTimeslots(stringyTimeslots)
-}
-
-// isEmptySchedule tries to work out, from MyRadio schedule JSON, whether the schedule is empty.
-func isEmptySchedule(data json.Marshaler) bool {
-	bs, err := data.MarshalJSON()
-	if err != nil {
-		// The logic later on in GetWeekSchedule should hit this same error, so handle it there.
-		return false
-	}
-
-	if len(bs) != 2 {
-		return false
-	}
-
-	// Due to a quirk in MyRadio (well, PHP), the empty schedule can be returned as the empty array '[]',
-	// instead of the empty object '{}'.
-	if bs[0] == '[' && bs[1] == ']' {
-		return true
-	}
-
-	if bs[0] == '{' && bs[1] == '}' {
-		return true
-	}
-
-	return false
 }
 
 // destringTimeslots converts a week schedule from string indices to integer indices.

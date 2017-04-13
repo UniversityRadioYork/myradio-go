@@ -14,10 +14,83 @@ import (
 	"strings"
 )
 
+// Request represents an API request being built.
+type Request struct {
+	// The endpoint, as a suffix of the API root URL.
+	Endpoint string
+	// The set of mixins to use.
+	Mixins []string
+	// The map of parameters to use.
+	Params map[string][]string
+}
+
+// Get constructs a new request for the given endpoint.
+func Get(endpoint string) *Request {
+	r := Request{}
+	r.Endpoint = endpoint
+	return &r
+}
+
+// Get constructs a new request for the endpoint constructed with the given format string and parameters.
+func Getf(format string, params ...interface{}) *Request {
+	return Get(fmt.Sprintf(format, params...))
+}
+
+// Response represents the result of an API request.
+type Response struct {
+	raw *json.RawMessage
+	err error
+}
+
+// IsEmpty checks whether the response payload is present, but empty.
+func (r *Response) IsEmpty() bool {
+	if r.err == nil {
+		return false
+	}
+
+	if r.raw == nil {
+		return true
+	}
+
+	// Check for 'empty' JSON payloads.
+	bs, err := r.raw.MarshalJSON()
+	if err != nil {
+		return false
+	}
+
+	if len(bs) != 2 {
+		return false
+	}
+
+	if bs[0] == '[' && bs[1] == ']' {
+		return true
+	}
+
+	if bs[0] == '{' && bs[1] == '}' {
+		return true
+	}
+
+	return false
+}
+
+// JSON returns r as raw JSON.
+func (r *Response) JSON() (*json.RawMessage, error) {
+	return r.raw, r.err
+}
+
+// Into unmarshals the response r into in.
+func (r *Response) Into(in interface{}) error {
+	if r.err != nil {
+		return r.err
+	}
+
+	return json.Unmarshal(*r.raw, in)
+}
+
 // Requester is the type of anything that can handle an API request.
 type Requester interface {
 	// Do fulfils an API request.
-	Do(r *Request) (*json.RawMessage, error)
+	Do(r *Request) *Response
 }
 
 // authedRequester answers API requests by making an authed API call.
@@ -35,38 +108,38 @@ func NewRequester(apikey string, url url.URL) Requester {
 }
 
 // Do fulfils an API request.
-func (s *authedRequester) Do(r *Request) (*json.RawMessage, error) {
+func (s *authedRequester) Do(r *Request) *Response {
 	urlParams := url.Values{
 		"api_key": []string{s.apikey},
 	}
-	if len(r.mixins) > 0 {
-		urlParams.Add("mixins", strings.Join(r.mixins, ","))
+	if len(r.Mixins) > 0 {
+		urlParams.Add("mixins", strings.Join(r.Mixins, ","))
 	}
-	for k, vs := range r.params {
+	for k, vs := range r.Params {
 		for _, v := range vs {
 			urlParams.Add(k, v)
 		}
 	}
 
 	theurl := s.baseurl
-	theurl.Path += r.endpoint
+	theurl.Path += r.Endpoint
 	theurl.RawQuery = urlParams.Encode()
 	req, err := http.NewRequest("GET", theurl.String(), nil)
 	if err != nil {
-		return nil, err
+		return &Response{err: err}
 	}
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return &Response{err: err}
 	}
 	if res.StatusCode != 200 {
-		return nil, fmt.Errorf(r.endpoint + fmt.Sprintf(" Not ok: HTTP %d", res.StatusCode))
+		return &Response{err: fmt.Errorf(r.Endpoint + fmt.Sprintf(" Not ok: HTTP %d", res.StatusCode))}
 	}
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, err
+		return &Response{err: err}
 	}
 	var response struct {
 		Status  string
@@ -74,12 +147,12 @@ func (s *authedRequester) Do(r *Request) (*json.RawMessage, error) {
 	}
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		return nil, err
+		return &Response{err: err}
 	}
 	if response.Status != "OK" {
-		return nil, fmt.Errorf(r.endpoint + fmt.Sprintf(" Response not OK: %v", response))
+		return &Response{err: fmt.Errorf(r.Endpoint + fmt.Sprintf(" Response not OK: %v", response))}
 	}
-	return response.Payload, nil
+	return &Response{raw: response.Payload, err: nil}
 }
 
 // mockRequester answers API requests by returning some stock response.
@@ -93,52 +166,6 @@ func MockRequester(message *json.RawMessage) Requester {
 }
 
 // Do pretends to fulfil an API request, but actually returns the mockRequester's stock response.
-func (s *mockRequester) Do(r *Request) (*json.RawMessage, error) {
-	return s.message, nil
-}
-
-
-// Request represents an API request being built.
-type Request struct {
-	requester Requester
-	endpoint  string
-	mixins    []string
-	params    map[string][]string
-}
-
-// Mixin adds one or more mixins to an API request.
-// It returns a pointer to the original request.
-func (r *Request) Mixin(ms ...string) *Request {
-	r.mixins = append(r.mixins, ms...)
-	return r
-}
-
-// param adds a parameter with key k and values v to an API request.
-// It returns a pointer to the original request.
-func (r *Request) Param(k string, vs ...string) *Request {
-	r.params[k] = vs
-	return r
-}
-
-// Do runs a request and returns the raw JSON and error.
-func (r *Request) Do() (*json.RawMessage, error) {
-	return r.requester.Do(r)
-}
-
-// into runs a request and tries to unmarshal the result into in.
-func (r *Request) Into(in interface{}) error {
-	data, aerr := r.Do()
-	if aerr != nil {
-		return aerr
-	}
-
-	return json.Unmarshal(*data, in)
-}
-
-// Get constructs a new request for the given endpoint.
-func Get(rq Requester, endpoint string) *Request {
-	r := Request{}
-	r.requester = rq
-	r.endpoint = endpoint
-	return &r
+func (s *mockRequester) Do(r *Request) *Response {
+	return &Response{raw: s.message, err: nil}
 }

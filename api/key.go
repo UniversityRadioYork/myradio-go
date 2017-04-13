@@ -76,4 +76,3 @@ func getAPIKeyFromFile(path string) string {
 	s := string(b)
 	return strings.TrimSpace(s)
 }
-

@@ -1,9 +1,10 @@
 package myradio
 
 import (
-	"encoding/json"
 	"errors"
 	"time"
+
+	"github.com/UniversityRadioYork/myradio-go/api"
 )
 
 // User represents a MyRadio user.
@@ -45,22 +46,21 @@ type UserAlias struct {
 // GetUser retrieves the User with the given ID.
 // This consumes one API request.
 func (s *Session) GetUser(id int) (user *User, err error) {
-	err = s.getf("/user/%d", id).Mixin("personal_data").Into(&user)
+	rq := api.Getf("/user/%d", id)
+	rq.Mixins = []string{"personal_data"}
+	err = s.do(rq).Into(&user)
 	return
 }
 
 // GetUserBio retrieves the biography of the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserBio(id int) (bio string, err error) {
-	data, err := s.getf("/user/%d/bio/", id).Do()
-	if err != nil {
-		return
-	}
-	if data == nil {
+	rs := s.getf("/user/%d/bio/", id)
+	if rs.IsEmpty() {
 		err = errors.New("No bio set")
 		return
 	}
-	err = json.Unmarshal(*data, &bio)
+	err = rs.Into(&bio)
 	return
 }
 
@@ -74,15 +74,12 @@ func (s *Session) GetUserName(id int) (name string, err error) {
 // GetUserProfilePhoto retrieves the profile photo of the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserProfilePhoto(id int) (profilephoto Photo, err error) {
-	data, err := s.getf("/user/%d/profilephoto/", id).Do()
-	if err != nil {
-		return
-	}
-	if data == nil {
+	rs := s.getf("/user/%d/profilephoto/", id)
+	if rs.IsEmpty() {
 		err = errors.New("No profile picture set")
 		return
 	}
-	err = json.Unmarshal(*data, &profilephoto)
+	err = rs.Into(&profilephoto)
 	if err != nil {
 		return
 	}

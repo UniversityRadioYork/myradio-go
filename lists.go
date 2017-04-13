@@ -1,5 +1,7 @@
 package myradio
 
+import "github.com/UniversityRadioYork/myradio-go/api"
+
 // List represents a mailing list.
 type List struct {
 	Listid     int
@@ -18,6 +20,8 @@ func (s *Session) GetAllLists() (lists []List, err error) {
 // GetUsers retrieves all users subscribed to a given mailing list.
 // This consumes one API request.
 func (s *Session) GetUsers(l *List) (users []User, err error) {
-	err = s.getf("/list/%d/members", l.Listid).Mixin("personal_data").Into(&users)
+	rq := api.Getf("/list/%d/members", l.Listid)
+	rq.Mixins = []string{"personal_data"}
+	err = s.do(rq).Into(&users)
 	return
 }

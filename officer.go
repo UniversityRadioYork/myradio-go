@@ -1,6 +1,10 @@
 package myradio
 
-import "time"
+import (
+	"time"
+
+	"github.com/UniversityRadioYork/myradio-go/api"
+)
 
 // OfficerPosition represents a specific station officer position.
 type OfficerPosition struct {
@@ -27,7 +31,9 @@ type OfficerPosition struct {
 // The amount of detail can be controlled by adding MyRadio mixins.
 // This consumes one API request.
 func (s *Session) GetAllOfficerPositions(mixins []string) (positions []OfficerPosition, err error) {
-	if err = s.get("/officer/allofficerpositions").Mixin(mixins...).Into(&positions); err != nil {
+	rq := api.Get("/officer/allofficerpositions")
+	rq.Mixins = mixins
+	if err = s.do(rq).Into(&positions); err != nil {
 		return
 	}
 

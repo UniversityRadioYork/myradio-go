@@ -1,6 +1,10 @@
 package myradio
 
-import "time"
+import (
+	"time"
+
+	"github.com/UniversityRadioYork/myradio-go/api"
+)
 
 // Position represents a MyRadio officer position.
 type Position struct {
@@ -52,7 +56,9 @@ func (s *Session) GetCurrentTeams() (teams []Team, err error) {
 // GetTeamWithOfficers retrieves a team record with officer information for the given team name.
 // This consumes one API request.
 func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
-	if err = s.getf("/team/byalias/%s", teamName).Mixin("officers").Into(&team); err != nil {
+	rq := api.Getf("/team/byalias/%s", teamName)
+	rq.Mixins = []string{"officers"}
+	if err = s.do(rq).Into(&team); err != nil {
 		return
 	}
 
@@ -67,7 +73,9 @@ func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
 // The amount of detail can be controlled using MyRadio mixins.
 // This consumes one API request.
 func (s *Session) GetTeamHeadPositions(id int, mixins []string) (head []HeadPosition, err error) {
-	if err = s.getf("/team/%d/headpositions").Mixin(mixins...).Into(&head); err != nil {
+	rq := api.Getf("/team/%d/headpositions", id)
+	rq.Mixins = mixins
+	if err = s.do(rq).Into(&head); err != nil {
 		return
 	}
 

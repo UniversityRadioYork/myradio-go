@@ -2,9 +2,9 @@ package myradio
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/UniversityRadioYork/myradio-go/api"
 	"net/url"
+
+	"github.com/UniversityRadioYork/myradio-go/api"
 )
 
 // Session represents an open API session.
@@ -31,14 +31,20 @@ func MockSession(message []byte) (*Session, error) {
 	return &Session{requester: api.MockRequester(&rm)}, nil
 }
 
-// get constructs a new request for the given endpoint.
-func (s *Session) get(endpoint string) *api.Request {
-	return api.Get(s.requester, endpoint)
+// do fulfils, a request for the given endpoint.
+func (s *Session) do(r *api.Request) *api.Response {
+	return s.requester.Do(r)
 }
 
-// getf constructs a request whose endpoint is defined by a formatted string.
-func (s *Session) getf(format string, params ...interface{}) *api.Request {
-	return s.get(fmt.Sprintf(format, params...))
+// get creates, and fulfils, a GET request for the given endpoint.
+func (s *Session) get(endpoint string) *api.Response {
+	return s.do(api.Get(endpoint))
+}
+
+// get creates, and fulfils, a GET request for the endpoint created by
+// the given format string and parameters.
+func (s *Session) getf(format string, params ...interface{}) *api.Response {
+	return s.do(api.Getf(format, params...))
 }
 
 // NewSessionFromKeyFile tries to open a Session with the key from an API key file.
