@@ -38,13 +38,13 @@ func (s *Session) do(r *api.Request) *api.Response {
 
 // get creates, and fulfils, a GET request for the given endpoint.
 func (s *Session) get(endpoint string) *api.Response {
-	return s.do(api.Get(endpoint))
+	return s.do(api.NewRequest(endpoint))
 }
 
 // get creates, and fulfils, a GET request for the endpoint created by
 // the given format string and parameters.
 func (s *Session) getf(format string, params ...interface{}) *api.Response {
-	return s.do(api.Getf(format, params...))
+	return s.do(api.NewRequestf(format, params...))
 }
 
 // NewSessionFromKeyFile tries to open a Session with the key from an API key file.

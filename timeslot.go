@@ -149,7 +149,7 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 		return nil, fmt.Errorf("week %d is not within the ISO range 1..53", week)
 	}
 
-	rq := api.Getf("/timeslot/weekschedule/%d", week)
+	rq := api.NewRequestf("/timeslot/weekschedule/%d", week)
 	rq.Params["year"] = []string{strconv.Itoa(year)}
 	rs := s.do(rq)
 

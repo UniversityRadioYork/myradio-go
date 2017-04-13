@@ -38,7 +38,7 @@ func main() {
 	}
 
 	r := api.NewRequester(k, *u)
-	j, err := api.Get(r, endpoint).Do()
+	j, err := r.Do(api.NewRequest(endpoint)).JSON()
 	if err != nil {
 		log.Fatal(err)
 	}

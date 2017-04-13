@@ -31,7 +31,7 @@ type OfficerPosition struct {
 // The amount of detail can be controlled by adding MyRadio mixins.
 // This consumes one API request.
 func (s *Session) GetAllOfficerPositions(mixins []string) (positions []OfficerPosition, err error) {
-	rq := api.Get("/officer/allofficerpositions")
+	rq := api.NewRequest("/officer/allofficerpositions")
 	rq.Mixins = mixins
 	if err = s.do(rq).Into(&positions); err != nil {
 		return

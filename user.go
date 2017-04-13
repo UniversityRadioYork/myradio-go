@@ -46,7 +46,7 @@ type UserAlias struct {
 // GetUser retrieves the User with the given ID.
 // This consumes one API request.
 func (s *Session) GetUser(id int) (user *User, err error) {
-	rq := api.Getf("/user/%d", id)
+	rq := api.NewRequestf("/user/%d", id)
 	rq.Mixins = []string{"personal_data"}
 	err = s.do(rq).Into(&user)
 	return

@@ -56,7 +56,7 @@ func (s *Session) GetCurrentTeams() (teams []Team, err error) {
 // GetTeamWithOfficers retrieves a team record with officer information for the given team name.
 // This consumes one API request.
 func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
-	rq := api.Getf("/team/byalias/%s", teamName)
+	rq := api.NewRequestf("/team/byalias/%s", teamName)
 	rq.Mixins = []string{"officers"}
 	if err = s.do(rq).Into(&team); err != nil {
 		return
@@ -73,7 +73,7 @@ func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
 // The amount of detail can be controlled using MyRadio mixins.
 // This consumes one API request.
 func (s *Session) GetTeamHeadPositions(id int, mixins []string) (head []HeadPosition, err error) {
-	rq := api.Getf("/team/%d/headpositions", id)
+	rq := api.NewRequestf("/team/%d/headpositions", id)
 	rq.Mixins = mixins
 	if err = s.do(rq).Into(&head); err != nil {
 		return

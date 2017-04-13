@@ -24,16 +24,17 @@ type Request struct {
 	Params map[string][]string
 }
 
-// Get constructs a new request for the given endpoint.
-func Get(endpoint string) *Request {
+// NewRequest constructs a new request for the given endpoint.
+func NewRequest(endpoint string) *Request {
 	r := Request{}
 	r.Endpoint = endpoint
 	return &r
 }
 
-// Get constructs a new request for the endpoint constructed with the given format string and parameters.
-func Getf(format string, params ...interface{}) *Request {
-	return Get(fmt.Sprintf(format, params...))
+// NewRequestf constructs a new request for the endpoint constructed by
+// the given format string and parameters.
+func NewRequestf(format string, params ...interface{}) *Request {
+	return NewRequest(fmt.Sprintf(format, params...))
 }
 
 // Response represents the result of an API request.

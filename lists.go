@@ -20,7 +20,7 @@ func (s *Session) GetAllLists() (lists []List, err error) {
 // GetUsers retrieves all users subscribed to a given mailing list.
 // This consumes one API request.
 func (s *Session) GetUsers(l *List) (users []User, err error) {
-	rq := api.Getf("/list/%d/members", l.Listid)
+	rq := api.NewRequestf("/list/%d/members", l.Listid)
 	rq.Mixins = []string{"personal_data"}
 	err = s.do(rq).Into(&users)
 	return
