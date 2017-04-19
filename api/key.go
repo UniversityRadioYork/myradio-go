@@ -11,9 +11,9 @@ import (
 // https://github.com/UniversityRadioYork/urydb-go/blob/master/urydb.go
 
 var (
-	// ErrNoMYRADIOKEYFILE is the error thrown when MYRADIOKEYFILE is not present in
+	// ErrNoMYRADIOKEY is the error thrown when MYRADIOKEY is not present in
 	// the environment.
-	ErrNoMYRADIOKEYFILE = errors.New("MYRADIOKEYFILE not in environment")
+	ErrNoMYRADIOKEY = errors.New("MYRADIOKEY not in environment")
 	// ErrNoKeyFile is the error thrown when there
 	// is no myradio.key file.
 	ErrNoKeyFile = errors.New("couldn't find any API key file")
@@ -44,9 +44,9 @@ func GetAPIKey() (apikey string, err error) {
 
 // getAPIKey tries to get an API key from the environment.
 func getAPIKeyEnv() (apikey string, err error) {
-	apikey, err = os.Getenv("MYRADIOKEYFILE"), nil
+	apikey, err = os.Getenv("MYRADIOKEY"), nil
 	if apikey == "" {
-		err = ErrNoMYRADIOKEYFILE
+		err = ErrNoMYRADIOKEY
 	}
 	return
 }
