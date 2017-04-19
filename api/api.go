@@ -26,9 +26,11 @@ type Request struct {
 
 // NewRequest constructs a new request for the given endpoint.
 func NewRequest(endpoint string) *Request {
-	r := Request{}
-	r.Endpoint = endpoint
-	return &r
+	return &Request{
+		Endpoint: endpoint,
+		Mixins:   []string{},
+		Params:   map[string][]string{},
+	}
 }
 
 // NewRequestf constructs a new request for the endpoint constructed by
