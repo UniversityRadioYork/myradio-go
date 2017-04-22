@@ -62,17 +62,10 @@ func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
 // The position parameterType is either assistant or head
 // This consumes one API request.
 func getTeamPositions(positionType string, id int, mixins []string, s *Session) (position []Officer, err error) {
-	var request string
-	switch positionType {
-	case "assistant":
-		request = "/team/%d/assistantheadpositions"
-	case "head":
-		request = "/team/%d/headpositions"
-	default:
+	if positionType != "assistanthead" && positionType != "head" {
 		return
 	}
-
-	data, err := s.apiRequest(fmt.Sprintf(request, id), mixins)
+	data, err := s.apiRequest(fmt.Sprintf("/team/%d/%spositions", id, positionType), mixins)
 	if err != nil {
 		return
 	}
@@ -103,6 +96,6 @@ func (s *Session) GetTeamHeadPositions(id int, mixins []string) (head []Officer,
 // The amount of detail can be controlled using MyRadio mixins.
 // This consumes one API request.
 func (s *Session) GetTeamAssistantHeadPositions(id int, mixins []string) (assHead []Officer, err error) {
-	return getTeamPositions("assistant", id, mixins, s)
+	return getTeamPositions("assistanthead", id, mixins, s)
 
 }
