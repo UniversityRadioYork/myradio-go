@@ -27,6 +27,43 @@ type Show struct {
 	Id           uint64 `json:"id,omitempty"`
 }
 
+// IsZero determines whether the Show is the zero value.
+// This is useful for checking when, for example, there is no next show in a CurrentAndNext.
+func (s *Show) IsZero() bool {
+	// We could use reflect.DeepEqual(Show{}) here,
+	// but an easier way is to check a field that will _never_ be its zero value.
+	// Assume that EndTimeRaw will always be a number, or "The End of Time", not "".
+	// This assumption will eventually go stale!
+	return s.EndTimeRaw == ""
+}
+
+// Ends determines whether the Show has a defined end time.
+func (s *Show) Ends() bool {
+	// populateShowTimes() will define EndTime as zero if there isn't one.
+	return s.EndTime.IsZero()
+}
+
+// populateShowTimes sets the times for the given Show given their raw values.
+func (s *Show) populateShowTimes() error {
+	s.StartTime = time.Unix(s.StartTimeRaw, 0)
+
+	// As mentioned above, sometimes EndTimeRaw is "The End of Time".
+	// This is a known MyRadio-ism!
+	if s.EndTimeRaw == "The End of Time" {
+		// Whatever this is sent to should give 'true' for Show.Ends().
+		s.EndTime = time.Time{}
+		return nil
+	}
+
+	timeint, err := strconv.ParseInt(s.EndTimeRaw, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	s.EndTime = time.Unix(timeint, 0)
+	return nil
+}
+
 // Timeslot contains information about a single timeslot in the URY schedule.
 // A timeslot is a single slice of time on the schedule, typically one hour long.
 type Timeslot struct {
@@ -41,6 +78,24 @@ type Timeslot struct {
 	Duration       time.Duration
 	DurationRaw    string `json:"duration"`
 	MixcloudStatus string `json:"mixcloud_status"`
+}
+
+// populateTimeslotTimes sets the times for the given Timeslot given their raw values.
+func (t *Timeslot) populateTimeslotTimes() (err error) {
+	// Remember: a Timeslot is a supertype of Season.
+	if err = t.populateSeasonTimes(); err != nil {
+		return
+	}
+
+	t.Time = time.Unix(t.TimeRaw, 0)
+
+	t.StartTime, err = parseShortTime(t.StartTimeRaw)
+	if err != nil {
+		return
+	}
+
+	t.Duration, err = parseDuration(t.DurationRaw)
+	return
 }
 
 // TracklistItem represents a single item in a show tracklist.
@@ -58,52 +113,23 @@ type TracklistItem struct {
 
 // GetCurrentAndNext gets the current and next shows at the time of the call.
 // This consumes one API request.
-func (s *Session) GetCurrentAndNext() (*CurrentAndNext, error) {
-	data, err := s.apiRequest("/timeslot/currentandnext", []string{})
-	if err != nil {
-		return nil, err
+func (s *Session) GetCurrentAndNext() (can *CurrentAndNext, err error) {
+	if err = s.apiRequestInto(&can, "/timeslot/currentandnext", []string{}); err != nil {
+		return
 	}
 
-	var currentAndNext CurrentAndNext
-	err = json.Unmarshal(*data, &currentAndNext)
-	if err != nil {
-		return nil, err
-	}
-	currentAndNext.Current.StartTime = time.Unix(currentAndNext.Current.StartTimeRaw, 0)
-	if timeint, err := strconv.ParseInt(currentAndNext.Current.EndTimeRaw, 10, 64); err != nil {
-		currentAndNext.Current.EndTime = time.Unix(timeint, 0)
-	}
-	currentAndNext.Next.StartTime = time.Unix(currentAndNext.Next.StartTimeRaw, 0)
-	if timeint, err := strconv.ParseInt(currentAndNext.Next.EndTimeRaw, 10, 64); err != nil {
-		currentAndNext.Next.EndTime = time.Unix(timeint, 0)
-	}
-	return &currentAndNext, nil
-}
-
-// populateTimes fills in the cooked times in a MyRadio timeslot from their raw equivalents.
-func populateTimes(timeslot *Timeslot) error {
-	var err error = nil
-	timeslot.Time = time.Unix(timeslot.TimeRaw, 0)
-
-	// MyRadio returns local timestamps, not UTC.
-	timeslot.FirstTime, err = time.ParseInLocation("02/01/2006 15:04", timeslot.FirstTimeRaw, time.Local)
-	if err != nil {
-		return err
-	}
-	timeslot.Submitted, err = time.ParseInLocation("02/01/2006 15:04", timeslot.SubmittedRaw, time.Local)
-	if err != nil {
-		return err
-	}
-	timeslot.StartTime, err = time.ParseInLocation("02/01/2006 15:04", timeslot.StartTimeRaw, time.Local)
-	if err != nil {
-		return err
-	}
-	timeslot.Duration, err = parseDuration(timeslot.DurationRaw)
-	if err != nil {
-		return err
+	if err = can.Current.populateShowTimes(); err != nil {
+		return
 	}
 
-	return nil
+	// Sometimes, we only get a Current, not a Next.
+	// Don't try populate times on a show that doesn't exist.
+	if can.Next.IsZero() {
+		return
+	}
+	err = can.Next.populateShowTimes()
+
+	return
 }
 
 // GetWeekSchedule gets the weekly schedule for ISO 8601 week week of year year.
@@ -122,9 +148,9 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 		return nil, fmt.Errorf("week %d is not within the ISO range 1..53", week)
 	}
 
-	data, err := s.apiRequestWithParams(fmt.Sprintf("/timeslot/weekschedule/%d", week), []string{}, map[string][]string{"year": {strconv.Itoa(year)}})
-	if err != nil {
-		return nil, err
+	data, aerr := s.apiRequestWithParams(fmt.Sprintf("/timeslot/weekschedule/%d", week), []string{}, map[string][]string{"year": {strconv.Itoa(year)}})
+	if aerr != nil {
+		return nil, aerr
 	}
 
 	// MyRadio responds in a different way when the schedule is empty, so we need to catch that.
@@ -145,16 +171,15 @@ func (s *Session) GetWeekSchedule(year, week int) (map[int][]Timeslot, error) {
 	// These timeslots start from "1" (Monday) and go up to "7" (Sunday).
 	// Note that this is different from Go's view of the week (0 = Sunday, 1 = Monday)!
 	stringyTimeslots := make(map[string][]Timeslot)
-	err = json.Unmarshal(*data, &stringyTimeslots)
-	if err != nil {
-		return nil, err
+	if jerr := json.Unmarshal(*data, &stringyTimeslots); jerr != nil {
+		return nil, jerr
 	}
 
 	return destringTimeslots(stringyTimeslots)
 }
 
 // isEmptySchedule tries to work out, from MyRadio schedule JSON, whether the schedule is empty.
-func isEmptySchedule(data *json.RawMessage) bool {
+func isEmptySchedule(data json.Marshaler) bool {
 	bs, err := data.MarshalJSON()
 	if err != nil {
 		// The logic later on in GetWeekSchedule should hit this same error, so handle it there.
@@ -184,14 +209,13 @@ func isEmptySchedule(data *json.RawMessage) bool {
 func destringTimeslots(stringyTimeslots map[string][]Timeslot) (map[int][]Timeslot, error) {
 	timeslots := make(map[int][]Timeslot)
 	for sday, ts := range stringyTimeslots {
-		day, err := strconv.Atoi(sday)
-		if err != nil {
-			return nil, err
+		day, derr := strconv.Atoi(sday)
+		if derr != nil {
+			return nil, derr
 		}
 		for i := range ts {
-			err = populateTimes(&ts[i])
-			if err != nil {
-				return nil, err
+			if terr := ts[i].populateTimeslotTimes(); terr != nil {
+				return nil, terr
 			}
 		}
 		timeslots[day] = ts
@@ -203,29 +227,19 @@ func destringTimeslots(stringyTimeslots map[string][]Timeslot) (map[int][]Timesl
 // GetTimeslot retrieves the timeslot with the given ID.
 // This consumes one API request.
 func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/timeslot/%d", id), []string{})
-	if err != nil {
+	if err = s.apiRequestInto(&timeslot, fmt.Sprintf("/timeslot/%d", id), []string{}); err != nil {
 		return
 	}
-	err = json.Unmarshal(*data, &timeslot)
-	if err != nil {
-		return
-	}
-	err = populateTimes(&timeslot)
-	if err != nil {
-		return
-	}
+	err = timeslot.populateTimeslotTimes()
 	return
 }
 
 // GetTrackListForTimeslot retrieves the tracklist for the timeslot with the given ID.
 // This consumes one API request.
 func (s *Session) GetTrackListForTimeslot(id int) (tracklist []TracklistItem, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/tracklistItem/tracklistfortimeslot/%d", id), []string{})
-	if err != nil {
+	if err = s.apiRequestInto(&tracklist, fmt.Sprintf("/tracklistItem/tracklistfortimeslot/%d", id), []string{}); err != nil {
 		return
 	}
-	err = json.Unmarshal(*data, &tracklist)
 	for k, v := range tracklist {
 		tracklist[k].Time = time.Unix(tracklist[k].TimeRaw, 0)
 		tracklist[k].StartTime, err = time.Parse("02/01/2006 15:04:05", v.StartTimeRaw)

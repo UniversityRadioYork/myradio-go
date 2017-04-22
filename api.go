@@ -50,6 +50,9 @@ func (s *authedRequester) request(endpoint string, mixins []string, params map[s
 	}
 	client := &http.Client{}
 	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
 	if res.StatusCode != 200 {
 		return nil, fmt.Errorf(endpoint + fmt.Sprintf(" Not ok: HTTP %d", res.StatusCode))
 	}
@@ -118,4 +121,14 @@ func (s *Session) apiRequestWithParams(endpoint string, mixins []string, params 
 // apiRequest conducts a GET request without custom parameters.
 func (s *Session) apiRequest(endpoint string, mixins []string) (*json.RawMessage, error) {
 	return s.apiRequestWithParams(endpoint, mixins, map[string][]string{})
+}
+
+// apiRequestInto conducts a GET request without custom parameters, and marshals the result directly into v.
+func (s *Session) apiRequestInto(v interface{}, endpoint string, mixins []string) error {
+	data, aerr := s.apiRequest(endpoint, mixins)
+	if aerr != nil {
+		return aerr
+	}
+
+	return json.Unmarshal(*data, v)
 }
