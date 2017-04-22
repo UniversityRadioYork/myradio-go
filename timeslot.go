@@ -44,7 +44,7 @@ func (s *Show) Ends() bool {
 }
 
 // populateShowTimes sets the times for the given Show given their raw values.
-func (s *Show) populateShowTimes() error {
+func (s *Show) populateShowTimes() {
 	s.StartTime = time.Unix(s.StartTimeRaw, 0)
 
 	// As mentioned above, sometimes EndTimeRaw is "The End of Time".
@@ -56,7 +56,6 @@ func (s *Show) populateShowTimes() error {
 		s.EndTime = time.Unix(t, 0)
 
 	}
-	return nil
 }
 
 // Timeslot contains information about a single timeslot in the URY schedule.
