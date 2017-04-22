@@ -20,7 +20,7 @@ type Show struct {
 	Photo        string `json:"photo"`
 	StartTimeRaw int64  `json:"start_time"`
 	StartTime    time.Time
-	EndTimeRaw   string `json:"end_time"` // Sometimes "The End of Time"
+	EndTimeRaw   interface{} `json:"end_time"` // Sometimes "The End of Time"
 	EndTime      time.Time
 	Presenters   string `json:"presenters,omitempty"`
 	Url          string `json:"url,omitempty"`
@@ -49,18 +49,13 @@ func (s *Show) populateShowTimes() error {
 
 	// As mentioned above, sometimes EndTimeRaw is "The End of Time".
 	// This is a known MyRadio-ism!
-	if s.EndTimeRaw == "The End of Time" {
-		// Whatever this is sent to should give 'true' for Show.Ends().
+	switch t := s.EndTimeRaw.(type) {
+	case string:
 		s.EndTime = time.Time{}
-		return nil
-	}
+	case int64:
+		s.EndTime = time.Unix(t, 0)
 
-	timeint, err := strconv.ParseInt(s.EndTimeRaw, 10, 64)
-	if err != nil {
-		return err
 	}
-
-	s.EndTime = time.Unix(timeint, 0)
 	return nil
 }
 
