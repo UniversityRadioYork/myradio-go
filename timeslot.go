@@ -112,16 +112,14 @@ func (s *Session) GetCurrentAndNext() (can *CurrentAndNext, err error) {
 		return
 	}
 
-	if err = can.Current.populateShowTimes(); err != nil {
-		return
-	}
+	can.Current.populateShowTimes()
 
 	// Sometimes, we only get a Current, not a Next.
 	// Don't try populate times on a show that doesn't exist.
 	if can.Next.IsZero() {
 		return
 	}
-	err = can.Next.populateShowTimes()
+	can.Next.populateShowTimes()
 
 	return
 }
