@@ -2,6 +2,7 @@ package myradio
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -53,7 +54,7 @@ func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
 // This consumes one API request.
 func getTeamPositions(positionType string, id int, mixins []string, s *Session) (position []Officer, err error) {
 	if positionType != "assistanthead" && positionType != "head" {
-		return
+		return nil, errors.New("Invalid position type provided")
 	}
 	data, err := s.apiRequest(fmt.Sprintf("/team/%d/%spositions", id, positionType), mixins)
 	if err != nil {
