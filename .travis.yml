@@ -13,4 +13,4 @@ notifications:
 before_install:
   - if [ "$TRAVIS_GO_VERSION" = "1.8" ]; then go get github.com/mattn/goveralls; fi
 script:
-  - if [ "$TRAVIS_GO_VERSION" = "1.8" ]; then $HOME/gopath/bin/goveralls -service=travis-ci -package="./..."; fi
+  - if [ "$TRAVIS_GO_VERSION" = "1.8" ]; then $HOME/gopath/bin/goveralls -service=travis-ci; fi
