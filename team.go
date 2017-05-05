@@ -1,7 +1,6 @@
 package myradio
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -60,14 +59,10 @@ func getTeamPositions(positionType string, id int, mixins []string, s *Session) 
 	if positionType != "assistanthead" && positionType != "head" {
 		return nil, errors.New("Invalid position type provided")
 	}
-  rq := api.NewRequestf(fmt.Sprintf("/team/%d/%spositions", id, positionType))
-  rq.Mixins = mixins
-  
-	if err = s.do(rq).Into(&head); err != nil {
-		return
-	}
-	err = json.Unmarshal(*data, &position)
-	if err != nil {
+	rq := api.NewRequestf(fmt.Sprintf("/team/%d/%spositions", id, positionType))
+	rq.Mixins = mixins
+
+	if err = s.do(rq).Into(&position); err != nil {
 		return
 	}
 	for k, v := range position {
