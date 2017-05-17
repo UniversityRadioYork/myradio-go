@@ -87,6 +87,9 @@ func (r *Response) Into(in interface{}) error {
 		return r.err
 	}
 
+	if r.raw == nil {
+		return nil
+	}
 	return json.Unmarshal(*r.raw, in)
 }
 
