@@ -1,10 +1,11 @@
 package myradio
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/UniversityRadioYork/myradio-go/api"
 )
 
 // Officer represents information about an officership inside a Team.
@@ -30,14 +31,16 @@ type Team struct {
 // GetCurrentTeams retrieves all teams inside the station committee.
 // This consumes one API request.
 func (s *Session) GetCurrentTeams() (teams []Team, err error) {
-	err = s.apiRequestInto(&teams, "/team/currentteams/", []string{})
+	err = s.get("/team/currentteams/").Into(&teams)
 	return
 }
 
 // GetTeamWithOfficers retrieves a team record with officer information for the given team name.
 // This consumes one API request.
 func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
-	if err = s.apiRequestInto(&team, fmt.Sprintf("/team/byalias/%s", teamName), []string{"officers"}); err != nil {
+	rq := api.NewRequestf("/team/byalias/%s", teamName)
+	rq.Mixins = []string{"officers"}
+	if err = s.do(rq).Into(&team); err != nil {
 		return
 	}
 
@@ -56,12 +59,10 @@ func getTeamPositions(positionType string, id int, mixins []string, s *Session) 
 	if positionType != "assistanthead" && positionType != "head" {
 		return nil, errors.New("Invalid position type provided")
 	}
-	data, err := s.apiRequest(fmt.Sprintf("/team/%d/%spositions", id, positionType), mixins)
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(*data, &position)
-	if err != nil {
+	rq := api.NewRequestf(fmt.Sprintf("/team/%d/%spositions", id, positionType))
+	rq.Mixins = mixins
+
+	if err = s.do(rq).Into(&position); err != nil {
 		return
 	}
 	for k, v := range position {

@@ -2,6 +2,8 @@ package myradio
 
 import (
 	"encoding/json"
+
+	"github.com/UniversityRadioYork/myradio-go/api"
 )
 
 // Alias represents a mail alias.
@@ -18,6 +20,8 @@ type Alias struct {
 // It takes a list of additional MyRadio API mixins to use when retrieving the aliases.
 // This consumes one API request.
 func (s *Session) GetAllAliases(mixins []string) (aliases []Alias, err error) {
-	err = s.apiRequestInto(&aliases, "/alias/allaliases", mixins)
+	rq := api.NewRequest("/alias/allaliases")
+	rq.Mixins = mixins
+	err = s.do(rq).Into(&aliases)
 	return
 }

@@ -1,10 +1,10 @@
 package myradio
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
 	"time"
+
+	"github.com/UniversityRadioYork/myradio-go/api"
 )
 
 // User represents a MyRadio user.
@@ -45,57 +45,41 @@ type UserAlias struct {
 
 // GetUser retrieves the User with the given ID.
 // This consumes one API request.
-func (s *Session) GetUser(id int) (*User, error) {
-	data, err := s.apiRequest(fmt.Sprintf("/user/%d", id), []string{"personal_data"})
-	if err != nil {
-		return nil, err
-	}
-	var user User
-	err = json.Unmarshal(*data, &user)
-	if err != nil {
-		return nil, err
-	}
-	return &user, nil
+func (s *Session) GetUser(id int) (user *User, err error) {
+	rq := api.NewRequestf("/user/%d", id)
+	rq.Mixins = []string{"personal_data"}
+	err = s.do(rq).Into(&user)
+	return
 }
 
 // GetUserBio retrieves the biography of the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserBio(id int) (bio string, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/user/%d/bio/", id), []string{})
-	if err != nil {
-		return
-	}
-	if data == nil {
+	rs := s.getf("/user/%d/bio/", id)
+	if rs.IsEmpty() {
 		err = errors.New("No bio set")
 		return
 	}
-	err = json.Unmarshal(*data, &bio)
+	err = rs.Into(&bio)
 	return
 }
 
 // GetUserName retrieves the name of the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserName(id int) (name string, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/user/%d/name/", id), []string{})
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(*data, &name)
+	err = s.getf("/user/%d/name/", id).Into(&name)
 	return
 }
 
 // GetUserProfilePhoto retrieves the profile photo of the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserProfilePhoto(id int) (profilephoto Photo, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/user/%d/profilephoto/", id), []string{})
-	if err != nil {
-		return
-	}
-	if data == nil {
+	rs := s.getf("/user/%d/profilephoto/", id)
+	if rs.IsEmpty() {
 		err = errors.New("No profile picture set")
 		return
 	}
-	err = json.Unmarshal(*data, &profilephoto)
+	err = rs.Into(&profilephoto)
 	if err != nil {
 		return
 	}
@@ -106,11 +90,7 @@ func (s *Session) GetUserProfilePhoto(id int) (profilephoto Photo, err error) {
 // GetUserOfficerships retrieves all officerships held by the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserOfficerships(id int) (officerships []Officership, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/user/%d/officerships/", id), []string{})
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(*data, &officerships)
+	err = s.getf("/user/%d/officerships/", id).Into(&officerships)
 	if err != nil {
 		return
 	}
@@ -134,23 +114,15 @@ func (s *Session) GetUserOfficerships(id int) (officerships []Officership, err e
 // GetUserShowCredits retrieves all show credits associated with the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserShowCredits(id int) (shows []ShowMeta, err error) {
-	data, err := s.apiRequest(fmt.Sprintf("/user/%d/shows/", id), []string{})
-	if err != nil {
-		return
-	}
-	err = json.Unmarshal(*data, &shows)
+	err = s.getf("/user/%d/shows/", id).Into(&shows)
 	return
 }
 
 // GetUserAliases retrieves all aliases associated with the user with the given ID.
 // This consumes one API request.
 func (s *Session) GetUserAliases() ([]UserAlias, error) {
-	data, err := s.apiRequest("/user/allaliases/", []string{})
-	if err != nil {
-		return nil, err
-	}
 	raw := [][]string{}
-	err = json.Unmarshal(*data, &raw)
+	err := s.get("/user/allaliases/").Into(&raw)
 	if err != nil {
 		return nil, err
 	}

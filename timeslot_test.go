@@ -1,10 +1,11 @@
 package myradio_test
 
 import (
-	myradio "github.com/UniversityRadioYork/myradio-go"
 	"reflect"
 	"testing"
 	"time"
+
+	myradio "github.com/UniversityRadioYork/myradio-go"
 )
 
 // testCanEntryZero tests whether a zero-valued CurrentAndNext entry returns true for IsZero.

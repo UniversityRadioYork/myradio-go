@@ -11,6 +11,6 @@ type Banner struct {
 // GetLiveBanners gets the current live banners
 // and returns a slice of banners
 func (s *Session) GetLiveBanners() (banners []Banner, err error) {
-	err = s.apiRequestInto(&banners, "/banner/livebanners/", []string{})
+	err = s.get("/banner/livebanners/").Into(&banners)
 	return
 }
