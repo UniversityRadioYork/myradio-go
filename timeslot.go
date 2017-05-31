@@ -21,7 +21,7 @@ type Show struct {
 	Photo        string `json:"photo"`
 	StartTimeRaw int64  `json:"start_time"`
 	StartTime    time.Time
-	EndTimeRaw   string `json:"end_time"` // Sometimes "The End of Time"
+	EndTimeRaw   interface{} `json:"end_time"` // Sometimes "The End of Time"
 	EndTime      time.Time
 	Presenters   string `json:"presenters,omitempty"`
 	Url          string `json:"url,omitempty"`
@@ -45,24 +45,18 @@ func (s *Show) Ends() bool {
 }
 
 // populateShowTimes sets the times for the given Show given their raw values.
-func (s *Show) populateShowTimes() error {
+func (s *Show) populateShowTimes() {
 	s.StartTime = time.Unix(s.StartTimeRaw, 0)
 
 	// As mentioned above, sometimes EndTimeRaw is "The End of Time".
 	// This is a known MyRadio-ism!
-	if s.EndTimeRaw == "The End of Time" {
-		// Whatever this is sent to should give 'true' for Show.Ends().
+	switch t := s.EndTimeRaw.(type) {
+	case string:
 		s.EndTime = time.Time{}
-		return nil
-	}
+	case int64:
+		s.EndTime = time.Unix(t, 0)
 
-	timeint, err := strconv.ParseInt(s.EndTimeRaw, 10, 64)
-	if err != nil {
-		return err
 	}
-
-	s.EndTime = time.Unix(timeint, 0)
-	return nil
 }
 
 // Timeslot contains information about a single timeslot in the URY schedule.
@@ -119,16 +113,14 @@ func (s *Session) GetCurrentAndNext() (can *CurrentAndNext, err error) {
 		return
 	}
 
-	if err = can.Current.populateShowTimes(); err != nil {
-		return
-	}
+	can.Current.populateShowTimes()
 
 	// Sometimes, we only get a Current, not a Next.
 	// Don't try populate times on a show that doesn't exist.
 	if can.Next.IsZero() {
 		return
 	}
-	err = can.Next.populateShowTimes()
+	can.Next.populateShowTimes()
 
 	return
 }
