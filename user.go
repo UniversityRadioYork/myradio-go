@@ -13,8 +13,9 @@ type User struct {
 	Fname, Sname string
 	Email        string `json:"public_email"`
 	Receiveemail bool   `json:"receive_email"`
-	Photo        string
-	Bio          string
+	//@TODO: fix the api and make it return a photo object
+	Photo string
+	Bio   string
 }
 
 // Officership represents an officership a user holds.
