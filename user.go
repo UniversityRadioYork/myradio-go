@@ -9,11 +9,12 @@ import (
 
 // User represents a MyRadio user.
 type User struct {
-	Memberid     int
+	MemberID     int
 	Fname, Sname string
-	Sex          string
 	Email        string `json:"public_email"`
 	Receiveemail bool   `json:"receive_email"`
+	Photo        string
+	Bio          string
 }
 
 // Officership represents an officership a user holds.
