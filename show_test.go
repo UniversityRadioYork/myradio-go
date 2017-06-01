@@ -20,9 +20,10 @@ const getSearchMetaJson = `
 				"memberid": 666,
 				"fname": "Tommy",
 				"sname": "Tutone",
-				"sex": "m",
 				"public_email": "tt500@example.com",
-				"receive_email": false
+				"receive_email": false,
+				"photo": "/media/image_meta/MyRadioImageMetadata/1.jpeg",
+          		"bio": "generic bio"
 			}
 		}
 	],
@@ -67,12 +68,13 @@ func TestGetSearchMetaUnmarshal(t *testing.T) {
 				Type:     1,
 				MemberID: 666,
 				User: myradio.User{
-					Memberid:     666,
+					MemberID:     666,
 					Fname:        "Tommy",
 					Sname:        "Tutone",
-					Sex:          "m",
 					Email:        "tt500@example.com",
 					Receiveemail: false,
+					Photo:        "/media/image_meta/MyRadioImageMetadata/1.jpeg",
+					Bio:          "generic bio",
 				},
 			},
 		},
