@@ -15,7 +15,6 @@ const positionJSON = `
 		"memberid": 10,
 		"fname": "John",
 		"sname": "Smith",
-		"sex": "m",
 		"public_email": "john.smith@example.org.uk",
 		"url": "//example.org.uk/myradio/Profile/view/?memberid=10",
 		"receive_email": true,
@@ -49,12 +48,13 @@ func TestGetTeamHeadPositions(t *testing.T) {
 	expected := []myradio.Officer{
 		{
 			User: myradio.User{
-				Memberid:     10,
+				MemberID:     10,
 				Fname:        "John",
 				Sname:        "Smith",
-				Sex:          "m",
 				Email:        "john.smith@example.org.uk",
 				Receiveemail: true,
+				Photo:        "/media/image_meta/MyRadioImageMetadata/1.jpeg",
+				Bio:          "generic bio",
 			},
 			From:            time.Unix(1479081600, 0),
 			FromRaw:         1479081600,
@@ -100,12 +100,13 @@ func TestGetTeamAssistantHeadPositions(t *testing.T) {
 	expected := []myradio.Officer{
 		{
 			User: myradio.User{
-				Memberid:     10,
+				MemberID:     10,
 				Fname:        "John",
 				Sname:        "Smith",
-				Sex:          "m",
 				Email:        "john.smith@example.org.uk",
 				Receiveemail: true,
+				Photo:        "/media/image_meta/MyRadioImageMetadata/1.jpeg",
+				Bio:          "generic bio",
 			},
 			From:            time.Unix(1479081600, 0),
 			FromRaw:         1479081600,
