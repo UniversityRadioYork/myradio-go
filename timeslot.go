@@ -24,8 +24,8 @@ type Show struct {
 	EndTimeRaw   string `json:"end_time"` // Sometimes "The End of Time"
 	EndTime      time.Time
 	Presenters   string `json:"presenters,omitempty"`
-	Url          string `json:"url,omitempty"`
-	Id           uint64 `json:"id,omitempty"`
+	URL          string `json:"url,omitempty"`
+	ID           uint64 `json:"id,omitempty"`
 }
 
 // IsZero determines whether the Show is the zero value.

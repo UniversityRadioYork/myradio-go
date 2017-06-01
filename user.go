@@ -18,9 +18,9 @@ type User struct {
 
 // Officership represents an officership a user holds.
 type Officership struct {
-	OfficerId   uint   `json:"officerid,string"`
+	OfficerID   uint   `json:"officerid,string"`
 	OfficerName string `json:"officer_name"`
-	TeamId      uint   `json:"teamid,string"`
+	TeamID      uint   `json:"teamid,string"`
 	FromDateRaw string `json:"from_date,omitempty"`
 	FromDate    time.Time
 	TillDateRaw string `json:"till_date,omitempty"`
@@ -29,12 +29,12 @@ type Officership struct {
 
 // Photo represents a photo of a user.
 type Photo struct {
-	PhotoId      uint   `json:"photoid"`
+	PhotoID      uint   `json:"photoid"`
 	DateAddedRaw string `json:"date_added"`
 	DateAdded    time.Time
 	Format       string `json:"format"`
 	Owner        uint   `json:"owner"`
-	Url          string `json:"url"`
+	URL          string `json:"url"`
 }
 
 // UserAlias represents a user alias.

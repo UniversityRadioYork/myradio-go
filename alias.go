@@ -8,7 +8,7 @@ import (
 
 // Alias represents a mail alias.
 type Alias struct {
-	Id           int `json:"alias_id"`
+	ID           int `json:"alias_id"`
 	Source       string
 	Destinations []struct {
 		Atype string `json:"type"`
