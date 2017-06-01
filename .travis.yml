@@ -11,6 +11,7 @@ notifications:
   email: false
 
 before_install:
+  - go test ./...
   - if [ "$TRAVIS_GO_VERSION" = "1.8" ]; then go get github.com/mattn/goveralls; fi
 script:
   - go test ./...
