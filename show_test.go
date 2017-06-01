@@ -23,7 +23,7 @@ const getSearchMetaJson = `
 				"public_email": "tt500@example.com",
 				"receive_email": false,
 				"photo": "/media/image_meta/MyRadioImageMetadata/1.jpeg",
-          		"bio": "generic bio"
+				"bio": "generic bio"
 			}
 		}
 	],
