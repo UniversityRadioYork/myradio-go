@@ -12,7 +12,10 @@ import (
 // It does NOT (yet) test the converse.
 func testCanEntryZero(t *testing.T) {
 	s := myradio.Show{}
-	if !s.IsZero() {
+	if !s.StartTime.IsZero() {
+		t.Error("zero show returns false for IsZero")
+	}
+	if !s.EndTime.IsZero() {
 		t.Error("zero show returns false for IsZero")
 	}
 }
