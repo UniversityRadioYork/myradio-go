@@ -6,6 +6,7 @@ import "time"
 // A MyRadio season contains timeslots.
 type Season struct {
 	ShowMeta
+	Photo         string
 	SeasonID      int    `json:"season_id"`
 	SeasonNum     int    `json:"season_num"`
 	SubmittedRaw  string `json:"submitted"`
