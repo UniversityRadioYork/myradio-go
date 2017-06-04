@@ -8,10 +8,12 @@ import (
 	"github.com/UniversityRadioYork/myradio-go/api"
 )
 
+// CustomTime is a custom time wrapper
 type CustomTime struct {
 	time.Time
 }
 
+// UnmarshalJSON a method to convert myradio times to unit time stamps
 func (t *CustomTime) UnmarshalJSON(b []byte) (err error) {
 	var str = string(b)
 
