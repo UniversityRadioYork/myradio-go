@@ -17,7 +17,7 @@ func TestCanEntryZero(t *testing.T) {
 	}
 }
 
-// testCanEntryEnds tests whether a CurrentAndNext entry returns something sensible for Ends.
+// TestCanEntryEnds tests whether a CurrentAndNext entry returns something sensible for Ends.
 func TestCanEntryEnds(t *testing.T) {
 	cases := []struct {
 		t myradio.CustomTime
@@ -36,7 +36,7 @@ func TestCanEntryEnds(t *testing.T) {
 	}
 }
 
-// testGetWeekScheduleZero tests whether GetWeekSchedule handles empty schedules correctly.
+// TestGetWeekScheduleZero tests whether GetWeekSchedule handles empty schedules correctly.
 func TestGetWeekScheduleZero(t *testing.T) {
 	expected := map[int][]myradio.Timeslot{
 		1: {},
