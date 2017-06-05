@@ -51,7 +51,7 @@ type Show struct {
 // Ends determines whether the Show has a defined end time.
 func (s *Show) Ends() bool {
 	// populateShowTimes() will define EndTime as zero if there isn't one.
-	return s.EndTime.IsZero()
+	return !s.EndTime.IsZero()
 
 }
 
