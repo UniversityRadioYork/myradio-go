@@ -8,20 +8,17 @@ import (
 	myradio "github.com/UniversityRadioYork/myradio-go"
 )
 
-// testCanEntryZero tests whether a zero-valued CurrentAndNext entry returns true for IsZero.
+// TestCanEntryZero tests whether a zero-valued CurrentAndNext entry returns true for IsZero.
 // It does NOT (yet) test the converse.
-func testCanEntryZero(t *testing.T) {
+func TestCanEntryZero(t *testing.T) {
 	s := myradio.Show{}
-	if !s.StartTime.IsZero() {
-		t.Error("zero show returns false for IsZero")
-	}
-	if !s.EndTime.IsZero() {
+	if !s.StartTime.IsZero() || !s.EndTime.IsZero() {
 		t.Error("zero show returns false for IsZero")
 	}
 }
 
 // testCanEntryEnds tests whether a CurrentAndNext entry returns something sensible for Ends.
-func testCanEntryEnds(t *testing.T) {
+func TestCanEntryEnds(t *testing.T) {
 	cases := []struct {
 		t myradio.CustomTime
 		e bool
@@ -40,7 +37,7 @@ func testCanEntryEnds(t *testing.T) {
 }
 
 // testGetWeekScheduleZero tests whether GetWeekSchedule handles empty schedules correctly.
-func testGetWeekScheduleZero(t *testing.T) {
+func TestGetWeekScheduleZero(t *testing.T) {
 	expected := map[int][]myradio.Timeslot{
 		1: {},
 		2: {},
