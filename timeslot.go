@@ -8,6 +8,28 @@ import (
 	"github.com/UniversityRadioYork/myradio-go/api"
 )
 
+// Time is a custom time wrapper
+type Time struct {
+	time.Time
+}
+
+// UnmarshalJSON a method to convert myradio times to unit time stamps
+func (t *Time) UnmarshalJSON(b []byte) (err error) {
+	var str = string(b)
+
+	if str == "\"The End of Time\"" {
+		*t = Time{}
+	} else {
+		i, err := strconv.ParseInt(str, 10, 64)
+		if err != nil {
+			return err
+		}
+		*t = Time{time.Unix(i, 0)}
+	}
+
+	return
+}
+
 // CurrentAndNext stores a pair of current and next show.
 type CurrentAndNext struct {
 	Next    Show `json:"next"`
@@ -16,53 +38,21 @@ type CurrentAndNext struct {
 
 // Show contains a summary of information about a URY schedule timeslot.
 type Show struct {
-	Title        string `json:"title"`
-	Desc         string `json:"desc"`
-	Photo        string `json:"photo"`
-	StartTimeRaw int64  `json:"start_time"`
-	StartTime    time.Time
-	EndTimeRaw   string `json:"end_time"` // Sometimes "The End of Time"
-	EndTime      time.Time
-	Presenters   string `json:"presenters,omitempty"`
-	Url          string `json:"url,omitempty"`
-	Id           uint64 `json:"id,omitempty"`
-}
-
-// IsZero determines whether the Show is the zero value.
-// This is useful for checking when, for example, there is no next show in a CurrentAndNext.
-func (s *Show) IsZero() bool {
-	// We could use reflect.DeepEqual(Show{}) here,
-	// but an easier way is to check a field that will _never_ be its zero value.
-	// Assume that EndTimeRaw will always be a number, or "The End of Time", not "".
-	// This assumption will eventually go stale!
-	return s.EndTimeRaw == ""
+	Title      string `json:"title"`
+	Desc       string `json:"desc"`
+	Photo      string `json:"photo"`
+	StartTime  Time   `json:"start_time"`
+	EndTime    Time   `json:"end_time"` // Sometimes "The End of Time"
+	Presenters string `json:"presenters,omitempty"`
+	Url        string `json:"url,omitempty"`
+	Id         uint64 `json:"id,omitempty"`
 }
 
 // Ends determines whether the Show has a defined end time.
 func (s *Show) Ends() bool {
 	// populateShowTimes() will define EndTime as zero if there isn't one.
-	return s.EndTime.IsZero()
-}
+	return !s.EndTime.IsZero()
 
-// populateShowTimes sets the times for the given Show given their raw values.
-func (s *Show) populateShowTimes() error {
-	s.StartTime = time.Unix(s.StartTimeRaw, 0)
-
-	// As mentioned above, sometimes EndTimeRaw is "The End of Time".
-	// This is a known MyRadio-ism!
-	if s.EndTimeRaw == "The End of Time" {
-		// Whatever this is sent to should give 'true' for Show.Ends().
-		s.EndTime = time.Time{}
-		return nil
-	}
-
-	timeint, err := strconv.ParseInt(s.EndTimeRaw, 10, 64)
-	if err != nil {
-		return err
-	}
-
-	s.EndTime = time.Unix(timeint, 0)
-	return nil
 }
 
 // Timeslot contains information about a single timeslot in the URY schedule.
@@ -72,8 +62,7 @@ type Timeslot struct {
 	TimeslotID     uint64   `json:"timeslot_id"`
 	TimeslotNum    int      `json:"timeslot_num"`
 	Tags           []string `json:"tags"`
-	Time           time.Time
-	TimeRaw        int64 `json:"time"`
+	Time           Time     `json:"time"`
 	StartTime      time.Time
 	StartTimeRaw   string `json:"start_time"`
 	Duration       time.Duration
@@ -87,8 +76,6 @@ func (t *Timeslot) populateTimeslotTimes() (err error) {
 	if err = t.populateSeasonTimes(); err != nil {
 		return
 	}
-
-	t.Time = time.Unix(t.TimeRaw, 0)
 
 	t.StartTime, err = parseShortTime(t.StartTimeRaw)
 	if err != nil {
@@ -119,17 +106,11 @@ func (s *Session) GetCurrentAndNext() (can *CurrentAndNext, err error) {
 		return
 	}
 
-	if err = can.Current.populateShowTimes(); err != nil {
-		return
-	}
-
 	// Sometimes, we only get a Current, not a Next.
 	// Don't try populate times on a show that doesn't exist.
-	if can.Next.IsZero() {
+	if can.Next.EndTime.IsZero() {
 		return
 	}
-	err = can.Next.populateShowTimes()
-
 	return
 }
 
