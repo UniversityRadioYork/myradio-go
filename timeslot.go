@@ -8,23 +8,23 @@ import (
 	"github.com/UniversityRadioYork/myradio-go/api"
 )
 
-// CustomTime is a custom time wrapper
-type CustomTime struct {
+// Time is a custom time wrapper
+type Time struct {
 	time.Time
 }
 
 // UnmarshalJSON a method to convert myradio times to unit time stamps
-func (t *CustomTime) UnmarshalJSON(b []byte) (err error) {
+func (t *Time) UnmarshalJSON(b []byte) (err error) {
 	var str = string(b)
 
 	if str == "\"The End of Time\"" {
-		*t = CustomTime{}
+		*t = Time{}
 	} else {
 		i, err := strconv.ParseInt(str, 10, 64)
 		if err != nil {
 			return err
 		}
-		*t = CustomTime{time.Unix(i, 0)}
+		*t = Time{time.Unix(i, 0)}
 	}
 
 	return
@@ -38,14 +38,14 @@ type CurrentAndNext struct {
 
 // Show contains a summary of information about a URY schedule timeslot.
 type Show struct {
-	Title      string     `json:"title"`
-	Desc       string     `json:"desc"`
-	Photo      string     `json:"photo"`
-	StartTime  CustomTime `json:"start_time"`
-	EndTime    CustomTime `json:"end_time"` // Sometimes "The End of Time"
-	Presenters string     `json:"presenters,omitempty"`
-	Url        string     `json:"url,omitempty"`
-	Id         uint64     `json:"id,omitempty"`
+	Title      string `json:"title"`
+	Desc       string `json:"desc"`
+	Photo      string `json:"photo"`
+	StartTime  Time   `json:"start_time"`
+	EndTime    Time   `json:"end_time"` // Sometimes "The End of Time"
+	Presenters string `json:"presenters,omitempty"`
+	Url        string `json:"url,omitempty"`
+	Id         uint64 `json:"id,omitempty"`
 }
 
 // Ends determines whether the Show has a defined end time.
@@ -59,10 +59,10 @@ func (s *Show) Ends() bool {
 // A timeslot is a single slice of time on the schedule, typically one hour long.
 type Timeslot struct {
 	Season
-	TimeslotID     uint64     `json:"timeslot_id"`
-	TimeslotNum    int        `json:"timeslot_num"`
-	Tags           []string   `json:"tags"`
-	Time           CustomTime `json:"time"`
+	TimeslotID     uint64   `json:"timeslot_id"`
+	TimeslotNum    int      `json:"timeslot_num"`
+	Tags           []string `json:"tags"`
+	Time           Time     `json:"time"`
 	StartTime      time.Time
 	StartTimeRaw   string `json:"start_time"`
 	Duration       time.Duration

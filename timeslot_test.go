@@ -20,11 +20,11 @@ func TestCanEntryZero(t *testing.T) {
 // TestCanEntryEnds tests whether a CurrentAndNext entry returns something sensible for Ends.
 func TestCanEntryEnds(t *testing.T) {
 	cases := []struct {
-		t myradio.CustomTime
+		t myradio.Time
 		e bool
 	}{
-		{t: myradio.CustomTime{}, e: false},
-		{t: myradio.CustomTime{time.Date(2009, time.April, 13, 11, 11, 11, 0, time.UTC)}, e: true},
+		{t: myradio.Time{}, e: false},
+		{t: myradio.Time{time.Date(2009, time.April, 13, 11, 11, 11, 0, time.UTC)}, e: true},
 	}
 
 	for _, c := range cases {
