@@ -47,7 +47,7 @@ type Response struct {
 
 // IsEmpty checks whether the response payload is present, but empty.
 func (r *Response) IsEmpty() bool {
-	if r.err == nil {
+	if r.err != nil {
 		return false
 	}
 
