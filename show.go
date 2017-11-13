@@ -1,6 +1,8 @@
 package myradio
 
-import "net/url"
+import (
+	"net/url"
+)
 
 // Credit represents a show credit associating a user with a show.
 type Credit struct {
@@ -60,6 +62,43 @@ func (s *Session) GetSeasons(id int) (seasons []Season, err error) {
 		if err != nil {
 			return
 		}
+	}
+
+	return
+}
+
+// GetCreditsToUsers retrieves a map of credit names to users.
+// This consumes two API request.
+func (s *Session) GetCreditsToUsers(id int) (creditsToUsers map[string][]User, err error) {
+
+	type creditType struct {
+		Type int    `json:"value,string"`
+		Name string `json:"text"`
+	}
+
+	// First get the credit type to name
+	var creditTypes []creditType
+	if err = s.get("/scheduler/credittypes").Into(&creditTypes); err != nil {
+		return
+	}
+
+	// Get the credits of a show
+	var credits []Credit
+	if err = s.getf("/show/%d/credits", id).Into(&credits); err != nil {
+		return
+	}
+
+	// A map of credit type (int value) to the name of the credit (string)
+	var creditToName = make(map[int]string)
+	for _, cT := range creditTypes {
+		creditToName[cT.Type] = cT.Name
+	}
+
+	// A map of credit names (strings) to a list of users
+	creditsToUsers = make(map[string][]User)
+	for _, credit := range credits {
+		var creditName = creditToName[credit.Type]
+		creditsToUsers[creditName] = append(creditsToUsers[creditName], credit.User)
 	}
 
 	return
