@@ -69,7 +69,7 @@ func (s *Session) GetSeasons(id int) (seasons []Season, err error) {
 
 // GetCreditsToUsers retrieves a map of credit names to users.
 // This consumes two API request.
-func (s *Session) GetCreditsToUsers(id int) (creditsToUsers map[string][]User, err error) {
+func (s *Session) GetCreditsToUsers(id int, isTimeslot bool) (creditsToUsers map[string][]User, err error) {
 
 	type creditType struct {
 		Type int    `json:"value,string"`
@@ -84,7 +84,15 @@ func (s *Session) GetCreditsToUsers(id int) (creditsToUsers map[string][]User, e
 
 	// Get the credits of a show
 	var credits []Credit
-	if err = s.getf("/show/%d/credits", id).Into(&credits); err != nil {
+	var requestPath string
+
+	if isTimeslot {
+		requestPath = "/timeslot/%d/credits"
+	} else {
+		requestPath = "/show/%d/credits"
+	}
+
+	if err = s.getf(requestPath, id).Into(&credits); err != nil {
 		return
 	}
 
