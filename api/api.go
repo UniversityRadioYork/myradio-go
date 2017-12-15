@@ -6,6 +6,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -22,6 +23,10 @@ type Request struct {
 	Mixins []string
 	// The map of parameters to use.
 	Params map[string][]string
+	// The type of request (i.e. GET/POST etc.)
+	ReqType string
+	// The body of the request
+	Body bytes.Buffer
 }
 
 // NewRequest constructs a new request for the given endpoint.
@@ -30,6 +35,8 @@ func NewRequest(endpoint string) *Request {
 		Endpoint: endpoint,
 		Mixins:   []string{},
 		Params:   map[string][]string{},
+		ReqType:  "GET",
+		Body:     bytes.Buffer{},
 	}
 }
 
@@ -130,7 +137,10 @@ func (s *authedRequester) Do(r *Request) *Response {
 	theurl := s.baseurl
 	theurl.Path += r.Endpoint
 	theurl.RawQuery = urlParams.Encode()
-	req, err := http.NewRequest("GET", theurl.String(), nil)
+	fmt.Println(theurl.String())
+	fmt.Println(r.Body)
+	req, err := http.NewRequest(r.ReqType, theurl.String(), bytes.NewReader(r.Body.Bytes()))
+
 	if err != nil {
 		return &Response{err: err}
 	}

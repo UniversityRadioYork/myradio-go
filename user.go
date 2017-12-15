@@ -2,6 +2,7 @@ package myradio
 
 import (
 	"errors"
+	"log"
 	"time"
 
 	"github.com/UniversityRadioYork/myradio-go/api"
@@ -134,4 +135,12 @@ func (s *Session) GetUserAliases() ([]UserAlias, error) {
 		aliases[k].Destination = v[1]
 	}
 	return aliases, nil
+}
+
+// CreateNewUser creates a new myradio user with the given parameters
+// This consumes one API request.
+func (s *Session) CreateNewUser(formParams map[string][]string) (err error) {
+	rs := *s.postform("/user/createoractivate/", formParams)
+	log.Println(rs.JSON())
+	return
 }
