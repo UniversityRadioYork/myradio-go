@@ -1,7 +1,5 @@
 package myradio
 
-import "GitHub.com/UniversityRadioYork/myradio-go/api"
-
 // Podcast represents a podcast media item.
 type Podcast struct {
 	PodcastID     int `json:"podcast_id"`
@@ -10,6 +8,8 @@ type Podcast struct {
 	Status        string
 	Time          Time
 	Photo         string
+	File          string `json:"file"`
+	WebFile       string
 	EditLink      Link `json:"editlink"`
 	MicrositeLink Link `json:"micrositelink"`
 }
@@ -17,10 +17,7 @@ type Podcast struct {
 // Get retrieves the data for a single podcast from MyRadio given it's ID.
 // This consumes one API request.
 func (s *Session) Get(id int) (podcast *Podcast, err error) {
-	rq := api.NewRequestf("/podcast/%s", id)
-	if err = s.do(rq).Into(&podcast); err != nil {
-		return
-	}
+	err = s.getf("/podcast/%d", id).Into(&podcast)
 	return
 }
 
