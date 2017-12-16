@@ -136,10 +136,15 @@ func (s *authedRequester) Do(r *Request) *Response {
 
 	theurl := s.baseurl
 	theurl.Path += r.Endpoint
-	theurl.RawQuery = urlParams.Encode()
-	fmt.Println(theurl.String())
-	fmt.Println(r.Body)
+	if r.ReqType == "POST" {
+		r.Body.WriteString(urlParams.Encode())
+	} else {
+		theurl.RawQuery = urlParams.Encode()
+	}
 	req, err := http.NewRequest(r.ReqType, theurl.String(), bytes.NewReader(r.Body.Bytes()))
+	if r.ReqType == "POST" {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; param=value")
+	}
 
 	if err != nil {
 		return &Response{err: err}
@@ -149,13 +154,13 @@ func (s *authedRequester) Do(r *Request) *Response {
 	if err != nil {
 		return &Response{err: err}
 	}
-	if res.StatusCode != 200 {
-		return &Response{err: fmt.Errorf(r.Endpoint + fmt.Sprintf(" Not ok: HTTP %d", res.StatusCode))}
-	}
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return &Response{err: err}
+	}
+	if res.StatusCode != 200 {
+		return &Response{err: fmt.Errorf(r.Endpoint + fmt.Sprintf(" Not ok: HTTP %d", res.StatusCode))}
 	}
 	var response struct {
 		Status  string

@@ -57,9 +57,9 @@ func (s *Session) putf(format string, body bytes.Buffer, params ...interface{}) 
 	return s.do(r)
 }
 
-// postform creates, and fulfils, a POST request for the given endpoint,
+// post creates, and fulfils, a POST request for the given endpoint,
 // using the given form parameters
-func (s *Session) postform(endpoint string, formParams map[string][]string) *api.Response {
+func (s *Session) post(endpoint string, formParams map[string][]string) *api.Response {
 	r := api.NewRequest(endpoint)
 	r.ReqType = "POST"
 	r.Params = formParams
