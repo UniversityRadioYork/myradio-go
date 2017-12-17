@@ -160,7 +160,7 @@ func (s *authedRequester) Do(r *Request) *Response {
 		return &Response{err: err}
 	}
 	if res.StatusCode != 200 {
-		return &Response{err: fmt.Errorf(r.Endpoint + fmt.Sprintf(" Not ok: HTTP %d", res.StatusCode))}
+		return &Response{err: fmt.Errorf(r.Endpoint + fmt.Sprintf(" Not ok: HTTP %d\n", res.StatusCode) + string(data[:]))}
 	}
 	var response struct {
 		Status  string
