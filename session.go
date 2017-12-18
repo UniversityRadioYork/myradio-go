@@ -52,7 +52,7 @@ func (s *Session) getf(format string, params ...interface{}) *api.Response {
 // the given format string and parameters.
 func (s *Session) putf(format string, body bytes.Buffer, params ...interface{}) *api.Response {
 	r := api.NewRequestf(format, params...)
-	r.ReqType = "PUT"
+	r.ReqType = api.PUT_REQ
 	r.Body = body
 	return s.do(r)
 }
@@ -61,7 +61,7 @@ func (s *Session) putf(format string, body bytes.Buffer, params ...interface{}) 
 // using the given form parameters
 func (s *Session) post(endpoint string, formParams map[string][]string) *api.Response {
 	r := api.NewRequest(endpoint)
-	r.ReqType = "POST"
+	r.ReqType = api.POST_REQ
 	r.Params = formParams
 	return s.do(r)
 }

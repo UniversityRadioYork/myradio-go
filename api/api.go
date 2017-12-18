@@ -8,6 +8,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -24,9 +25,31 @@ type Request struct {
 	// The map of parameters to use.
 	Params map[string][]string
 	// The type of request (i.e. GET/POST etc.)
-	ReqType string
+	ReqType HTTPMethod
 	// The body of the request
 	Body bytes.Buffer
+}
+
+//Added to make sure noone shoves a made-up http method to DO
+type HTTPMethod int
+
+const (
+	GET_REQ HTTPMethod = iota
+	POST_REQ
+	PUT_REQ
+)
+
+func (m HTTPMethod) String() (string, error) {
+	switch m {
+	case GET_REQ:
+		return "GET", nil
+	case POST_REQ:
+		return "POST", nil
+	case PUT_REQ:
+		return "PUT", nil
+	default:
+		return "", errors.New("Invalid HTTP method specified")
+	}
 }
 
 // NewRequest constructs a new request for the given endpoint.
@@ -35,7 +58,7 @@ func NewRequest(endpoint string) *Request {
 		Endpoint: endpoint,
 		Mixins:   []string{},
 		Params:   map[string][]string{},
-		ReqType:  "GET",
+		ReqType:  GET_REQ,
 		Body:     bytes.Buffer{},
 	}
 }
@@ -122,6 +145,12 @@ func NewRequester(apikey string, url url.URL) Requester {
 
 // Do fulfils an API request.
 func (s *authedRequester) Do(r *Request) *Response {
+	//Validate the request method before we waste any time
+	reqMethod, err := r.ReqType.String()
+	if err != nil {
+		return &Response{err: err}
+	}
+
 	urlParams := url.Values{
 		"api_key": []string{s.apikey},
 	}
@@ -136,13 +165,18 @@ func (s *authedRequester) Do(r *Request) *Response {
 
 	theurl := s.baseurl
 	theurl.Path += r.Endpoint
-	if r.ReqType == "POST" {
-		r.Body.WriteString(urlParams.Encode())
+	encodedParams := urlParams.Encode()
+
+	//POST sends form params in the body
+	if r.ReqType == POST_REQ {
+		r.Body.WriteString(encodedParams)
 	} else {
-		theurl.RawQuery = urlParams.Encode()
+		theurl.RawQuery = encodedParams
 	}
-	req, err := http.NewRequest(r.ReqType, theurl.String(), bytes.NewReader(r.Body.Bytes()))
-	if r.ReqType == "POST" {
+	req, err := http.NewRequest(reqMethod, theurl.String(), bytes.NewReader(r.Body.Bytes()))
+
+	// Specify content type for POST requests, as the body format has to be specified
+	if r.ReqType == POST_REQ {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; param=value")
 	}
 
@@ -160,7 +194,7 @@ func (s *authedRequester) Do(r *Request) *Response {
 		return &Response{err: err}
 	}
 	if res.StatusCode != 200 {
-		return &Response{err: fmt.Errorf(r.Endpoint + fmt.Sprintf(" Not ok: HTTP %d\n", res.StatusCode) + string(data[:]))}
+		return &Response{err: fmt.Errorf("%s Not ok: HTTP %d\n%s", r.Endpoint, res.StatusCode, string(data))}
 	}
 	var response struct {
 		Status  string

@@ -34,14 +34,12 @@ func (s *Session) GetUsers(l *List) (users []User, err error) {
 // OptIn subscribes the given user to the given list
 // This consumes one API request.
 func (s *Session) OptIn(UserID int, ListID int) (err error) {
-	var body bytes.Buffer
+	body := bytes.NewBufferString(fmt.Sprintf("userid=%d", UserID))
 	var ok *bool
-	body.WriteString(fmt.Sprintf("userid=%d", UserID))
-	err = s.putf("/list/%d/optin", body, ListID).Into(&ok)
-	if err != nil {
+	if err = s.putf("/list/%d/optin", *body, ListID).Into(&ok); err != nil {
 		return
 	}
-	if *ok != true {
+	if !*ok {
 		err = errors.New("API responded with false")
 	}
 	return
