@@ -34,9 +34,11 @@ type Request struct {
 type HTTPMethod int
 
 const (
-	//GetReq and following consts are mapped to strings for request method
+	//GetReq corresponds to GET
 	GetReq HTTPMethod = iota
+	//PostReq corresponds to POST
 	PostReq
+	//PutReq corresponds to PUT
 	PutReq
 )
 
