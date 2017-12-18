@@ -30,22 +30,24 @@ type Request struct {
 	Body bytes.Buffer
 }
 
-//Added to make sure noone shoves a made-up http method to DO
+// HTTPMethod guards against incorrect methods being specified through strings
 type HTTPMethod int
 
 const (
-	GET_REQ HTTPMethod = iota
-	POST_REQ
-	PUT_REQ
+	//GetReq and following consts are mapped to strings for request method
+	GetReq HTTPMethod = iota
+	PostReq
+	PutReq
 )
 
+// String converts a HTTPMethod object into a usable request method string
 func (m HTTPMethod) String() (string, error) {
 	switch m {
-	case GET_REQ:
+	case GetReq:
 		return "GET", nil
-	case POST_REQ:
+	case PostReq:
 		return "POST", nil
-	case PUT_REQ:
+	case PutReq:
 		return "PUT", nil
 	default:
 		return "", errors.New("Invalid HTTP method specified")
@@ -58,7 +60,7 @@ func NewRequest(endpoint string) *Request {
 		Endpoint: endpoint,
 		Mixins:   []string{},
 		Params:   map[string][]string{},
-		ReqType:  GET_REQ,
+		ReqType:  GetReq,
 		Body:     bytes.Buffer{},
 	}
 }
@@ -168,7 +170,7 @@ func (s *authedRequester) Do(r *Request) *Response {
 	encodedParams := urlParams.Encode()
 
 	//POST sends form params in the body
-	if r.ReqType == POST_REQ {
+	if r.ReqType == PostReq {
 		r.Body.WriteString(encodedParams)
 	} else {
 		theurl.RawQuery = encodedParams
@@ -176,7 +178,7 @@ func (s *authedRequester) Do(r *Request) *Response {
 	req, err := http.NewRequest(reqMethod, theurl.String(), bytes.NewReader(r.Body.Bytes()))
 
 	// Specify content type for POST requests, as the body format has to be specified
-	if r.ReqType == POST_REQ {
+	if r.ReqType == PostReq {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; param=value")
 	}
 
