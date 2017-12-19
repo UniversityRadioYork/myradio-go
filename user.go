@@ -142,9 +142,9 @@ func (s *Session) GetUserAliases() ([]UserAlias, error) {
 	return aliases, nil
 }
 
-// CreateNewUser creates a new myradio user with the given parameters
+// CreateOrActivateUser creates oir activates a new myradio user with the given parameters
 // This consumes one API request.
-func (s *Session) CreateNewUser(formParams map[string][]string) (user *User, err error) {
+func (s *Session) CreateOrActivateUser(formParams map[string][]string) (user *User, err error) {
 	rs := s.post("/user/createoractivate", formParams)
 	err = rs.Into(&user)
 	return
