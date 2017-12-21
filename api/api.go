@@ -6,7 +6,9 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -22,6 +24,36 @@ type Request struct {
 	Mixins []string
 	// The map of parameters to use.
 	Params map[string][]string
+	// The type of request (i.e. GET/POST etc.)
+	ReqType HTTPMethod
+	// The body of the request
+	Body bytes.Buffer
+}
+
+// HTTPMethod guards against incorrect methods being specified through strings
+type HTTPMethod int
+
+const (
+	//GetReq corresponds to GET
+	GetReq HTTPMethod = iota
+	//PostReq corresponds to POST
+	PostReq
+	//PutReq corresponds to PUT
+	PutReq
+)
+
+// String converts a HTTPMethod object into a usable request method string
+func (m HTTPMethod) String() (string, error) {
+	switch m {
+	case GetReq:
+		return "GET", nil
+	case PostReq:
+		return "POST", nil
+	case PutReq:
+		return "PUT", nil
+	default:
+		return "", errors.New("Invalid HTTP method specified")
+	}
 }
 
 // NewRequest constructs a new request for the given endpoint.
@@ -30,6 +62,8 @@ func NewRequest(endpoint string) *Request {
 		Endpoint: endpoint,
 		Mixins:   []string{},
 		Params:   map[string][]string{},
+		ReqType:  GetReq,
+		Body:     bytes.Buffer{},
 	}
 }
 
@@ -115,6 +149,12 @@ func NewRequester(apikey string, url url.URL) Requester {
 
 // Do fulfils an API request.
 func (s *authedRequester) Do(r *Request) *Response {
+	//Validate the request method before we waste any time
+	reqMethod, err := r.ReqType.String()
+	if err != nil {
+		return &Response{err: err}
+	}
+
 	urlParams := url.Values{
 		"api_key": []string{s.apikey},
 	}
@@ -129,8 +169,21 @@ func (s *authedRequester) Do(r *Request) *Response {
 
 	theurl := s.baseurl
 	theurl.Path += r.Endpoint
-	theurl.RawQuery = urlParams.Encode()
-	req, err := http.NewRequest("GET", theurl.String(), nil)
+	encodedParams := urlParams.Encode()
+
+	//POST sends form params in the body
+	if r.ReqType == PostReq {
+		r.Body.WriteString(encodedParams)
+	} else {
+		theurl.RawQuery = encodedParams
+	}
+	req, err := http.NewRequest(reqMethod, theurl.String(), bytes.NewReader(r.Body.Bytes()))
+
+	// Specify content type for POST requests, as the body format has to be specified
+	if r.ReqType == PostReq {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; param=value")
+	}
+
 	if err != nil {
 		return &Response{err: err}
 	}
@@ -139,13 +192,13 @@ func (s *authedRequester) Do(r *Request) *Response {
 	if err != nil {
 		return &Response{err: err}
 	}
-	if res.StatusCode != 200 {
-		return &Response{err: fmt.Errorf(r.Endpoint + fmt.Sprintf(" Not ok: HTTP %d", res.StatusCode))}
-	}
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return &Response{err: err}
+	}
+	if res.StatusCode != 200 {
+		return &Response{err: fmt.Errorf("%s Not ok: HTTP %d\n%s", r.Endpoint, res.StatusCode, string(data))}
 	}
 	var response struct {
 		Status  string

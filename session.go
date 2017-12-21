@@ -1,6 +1,7 @@
 package myradio
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/url"
 
@@ -14,7 +15,7 @@ type Session struct {
 
 // NewSession constructs a new Session with the given API key.
 func NewSession(apikey string) (*Session, error) {
-	url, err := url.Parse(`https://ury.york.ac.uk/api/v2`)
+	url, err := url.Parse(`https://ury.org.uk/api/v2`)
 	if err != nil {
 		return nil, err
 	}
@@ -41,10 +42,28 @@ func (s *Session) get(endpoint string) *api.Response {
 	return s.do(api.NewRequest(endpoint))
 }
 
-// get creates, and fulfils, a GET request for the endpoint created by
+// getf creates, and fulfils, a GET request for the endpoint created by
 // the given format string and parameters.
 func (s *Session) getf(format string, params ...interface{}) *api.Response {
 	return s.do(api.NewRequestf(format, params...))
+}
+
+// putf creates, and fulfils, a PUT request for the endpoint created by
+// the given format string and parameters.
+func (s *Session) putf(format string, body bytes.Buffer, params ...interface{}) *api.Response {
+	r := api.NewRequestf(format, params...)
+	r.ReqType = api.PutReq
+	r.Body = body
+	return s.do(r)
+}
+
+// post creates, and fulfils, a POST request for the given endpoint,
+// using the given form parameters
+func (s *Session) post(endpoint string, formParams map[string][]string) *api.Response {
+	r := api.NewRequest(endpoint)
+	r.ReqType = api.PostReq
+	r.Params = formParams
+	return s.do(r)
 }
 
 // NewSessionFromKeyFile tries to open a Session with the key from an API key file.

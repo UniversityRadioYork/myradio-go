@@ -45,6 +45,12 @@ type UserAlias struct {
 	Destination string
 }
 
+// College represents a college.
+type College struct {
+	CollegeId   int    `json:"value,string"`
+	CollegeName string `json:"text"`
+}
+
 // GetUser retrieves the User with the given ID.
 // This consumes one API request.
 func (s *Session) GetUser(id int) (user *User, err error) {
@@ -134,4 +140,19 @@ func (s *Session) GetUserAliases() ([]UserAlias, error) {
 		aliases[k].Destination = v[1]
 	}
 	return aliases, nil
+}
+
+// CreateOrActivateUser creates oir activates a new myradio user with the given parameters
+// This consumes one API request.
+func (s *Session) CreateOrActivateUser(formParams map[string][]string) (user *User, err error) {
+	rs := s.post("/user/createoractivate", formParams)
+	err = rs.Into(&user)
+	return
+}
+
+// GetColleges retrieves a list of all current colleges
+// This consumes one API request.
+func (s *Session) GetColleges() (colleges []College, err error) {
+	err = s.get("/user/colleges").Into(&colleges)
+	return
 }
