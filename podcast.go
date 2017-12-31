@@ -28,11 +28,10 @@ func (s *Session) Get(id int) (podcast *Podcast, err error) {
 
 // GetAllPodcasts retrieves the latest podcasts from MyRadio.
 // This consumes one API request.
-func (s *Session) GetAllPodcasts(noResults int, page int) (podcasts []Podcast, err error) {
-	//err = s.getf("/podcast/allpodcasts?noResults=%d", noResults, page).Into(&podcasts)
+func (s *Session) GetAllPodcasts(numResults int, page int) (podcasts []Podcast, err error) {
 
 	rq := api.NewRequest("/podcast/allpodcasts")
-	rq.Params["noResults"] = []string{strconv.Itoa(noResults)}
+	rq.Params["num_results"] = []string{strconv.Itoa(numResults)}
 	rq.Params["page"] = []string{strconv.Itoa(page)}
 	rs := s.do(rq)
 
