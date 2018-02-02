@@ -53,10 +53,10 @@ func (s *Session) GetTeamWithOfficers(teamName string) (team Team, err error) {
 
 // getTeamPositions retrieves the positions for a given team ID and position type.
 // The amount of detail can be controlled using MyRadio mixins.
-// The position parameterType is either assistant or head
+// The position parameterType is either officer, assistant or head
 // This consumes one API request.
 func getTeamPositions(positionType string, id int, mixins []string, s *Session) (position []Officer, err error) {
-	if positionType != "assistanthead" && positionType != "head" {
+	if positionType != "assistanthead" && positionType != "head" && positionType != "officer" {
 		return nil, errors.New("Invalid position type provided")
 	}
 	rq := api.NewRequestf(fmt.Sprintf("/team/%d/%spositions", id, positionType))
@@ -90,5 +90,13 @@ func (s *Session) GetTeamHeadPositions(id int, mixins []string) (head []Officer,
 // This consumes one API request.
 func (s *Session) GetTeamAssistantHeadPositions(id int, mixins []string) (assHead []Officer, err error) {
 	return getTeamPositions("assistanthead", id, mixins, s)
+
+}
+
+// GetTeamOfficerPositions retrieves all the other officer positions for a given team ID.
+// The amount of detail can be controlled using MyRadio mixins.
+// This consumes one API request.
+func (s *Session) GetTeamOfficerPositions(id int, mixins []string) (officer []Officer, err error) {
+	return getTeamPositions("officer", id, mixins, s)
 
 }
