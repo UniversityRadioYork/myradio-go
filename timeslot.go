@@ -1,6 +1,7 @@
 package myradio
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
 	"time"
@@ -213,5 +214,18 @@ func (s *Session) GetTrackListForTimeslot(id int) (tracklist []TracklistItem, er
 			return nil, err
 		}
 	}
+	return
+}
+
+// PutMessage sends a message to the given timeslot.
+// This consumes one API request.
+func (s *Session) PutMessage(id uint64, msg string) (err error) {
+	var timeslot Timeslot
+	msg = "message=" + msg
+	err = s.putf("/timeslot/%d/sendmessage", *bytes.NewBufferString(msg), id).Into(&timeslot)
+	if err != nil {
+		return
+	}
+	err = timeslot.populateTimeslotTimes()
 	return
 }
