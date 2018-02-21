@@ -190,6 +190,16 @@ func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
 	return
 }
 
+// GetCurrentTimeslot retrieves the current timeslot.
+// This consumes one API request.
+func (s *Session) GetCurrentTimeslot() (timeslot Timeslot, err error) {
+	if err = s.get("/timeslot/currenttimeslot").Into(&timeslot); err != nil {
+		return
+	}
+	err = timeslot.populateTimeslotTimes()
+	return
+}
+
 // GetTrackListForTimeslot retrieves the tracklist for the timeslot with the given ID.
 // This consumes one API request.
 func (s *Session) GetTrackListForTimeslot(id int) (tracklist []TracklistItem, err error) {
