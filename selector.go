@@ -1,7 +1,25 @@
 package myradio
 
 import (
-	"github.com/UniversityRadioYork/myradio-go/api"
+//"github.com/UniversityRadioYork/myradio-go/api"
+)
+
+const (
+	// Values for the current selection/where it was selected from
+	SelectorStudio1 = 1
+	SelectorStudio2 = 2
+	SelectorJukebox = 3
+	SelectorAux     = 0
+	SelectorHub     = 3
+	// Values for the selector lock
+	LockOff = 0
+	LockAux = 1
+	LockKey = 2
+	// Values for studio power
+	OnNone = 0
+	OnS1   = 1
+	OnS2   = 2
+	OnBoth = 3
 )
 
 type SelectorInfo struct {
@@ -15,4 +33,5 @@ type SelectorInfo struct {
 // This consumes one API request.
 func (s *Session) GetSelectorInfo() (info *SelectorInfo, err error) {
 	err = s.get("/selector/query").Into(&info)
+	return
 }
