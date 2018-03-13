@@ -1,14 +1,11 @@
 package myradio
 
-import (
-//"github.com/UniversityRadioYork/myradio-go/api"
-)
-
 const (
 	// Values for the current selection/where it was selected from
 	SelectorStudio1 = 1
 	SelectorStudio2 = 2
 	SelectorJukebox = 3
+	SelectorOB      = 4
 	SelectorAux     = 0
 	SelectorHub     = 3
 	// Values for the selector lock
@@ -22,6 +19,7 @@ const (
 	OnBoth = 3
 )
 
+// SelectorInfo holds data from the /selector/query endpoint
 type SelectorInfo struct {
 	Studio       int `json:"studio"`
 	Lock         int `json:"lock"`
