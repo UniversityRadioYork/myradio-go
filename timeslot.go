@@ -116,16 +116,16 @@ func (s *Session) GetCurrentAndNext() (can *CurrentAndNext, err error) {
 
 // GetPreviousTimeslots gets the previous shows at the time of the call.
 // This consumes one API request.
-func (s *Session) GetPreviousTimeslots(numOfTimeslots int) (timeslots *Timeslot, err error) {
-	//n := strconv.Itoa(numOfTimeslots)
-	if err = s.get("/timeslot/previoustimeslots").Into(&timeslots); err != nil {
-		err = timeslots.populateTimeslotTimes()
-		/*for k := range timeslots {
-			err = timeslots[k].populateTimeslotTimes()
-			if err != nil {
-				return
-			}
-		} */
+func (s *Session) GetPreviousTimeslots(numOfTimeslots int) (timeslots []Timeslot, err error) {
+	rq := api.NewRequest("/timeslot/previoustimeslots")
+	rq.Params["n"] = []string{strconv.Itoa(numOfTimeslots)}
+	rs := s.do(rq)
+
+	if err = rs.Into(&timeslots); err != nil {
+		return
+	}
+	for k := range timeslots {
+		err = timeslots[k].populateTimeslotTimes()
 		if err != nil {
 			return
 		}
