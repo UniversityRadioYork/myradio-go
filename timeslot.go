@@ -115,6 +115,25 @@ func (s *Session) GetCurrentAndNext() (can *CurrentAndNext, err error) {
 	return
 }
 
+// GetPreviousTimeslots gets the previous shows at the time of the call.
+// This consumes one API request.
+func (s *Session) GetPreviousTimeslots(numOfTimeslots int) (timeslots []Timeslot, err error) {
+	rq := api.NewRequest("/timeslot/previoustimeslots")
+	rq.Params["n"] = []string{strconv.Itoa(numOfTimeslots)}
+	rs := s.do(rq)
+
+	if err = rs.Into(&timeslots); err != nil {
+		return
+	}
+	for k := range timeslots {
+		err = timeslots[k].populateTimeslotTimes()
+		if err != nil {
+			return
+		}
+	}
+	return
+}
+
 // GetWeekSchedule gets the weekly schedule for ISO 8601 week week of year year.
 // If such a schedule exists, it returns the result as an map from ISO 8601 weekdays to timeslot slices.
 // Thus, 1 maps to Monday's timeslots; 2 to Tuesday; and so on.
