@@ -5,6 +5,7 @@ const (
 	SelectorStudio1 = 1
 	SelectorStudio2 = 2
 	SelectorJukebox = 3
+	SelectorOffAir  = 8
 	SelectorOB      = 4
 	SelectorAux     = 0
 	SelectorHub     = 3
