@@ -1,6 +1,7 @@
 package myradio
 
 import (
+	"net/url"
 	"strconv"
 
 	"github.com/UniversityRadioYork/myradio-go/api"
@@ -40,4 +41,11 @@ func (s *Session) GetAllPodcasts(numResults int, page int) (podcasts []Podcast, 
 	}
 	return
 
+}
+
+// GetPodcastMeta retrieves all podcasts matching a given search term.
+// This consumes one API request.
+func (s *Session) GetPodcastMeta(term string) (podcasts []Podcast, err error) {
+	err = s.getf("/podcast/searchmeta/%s", url.QueryEscape(term)).Into(&podcasts)
+	return
 }

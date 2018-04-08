@@ -2,6 +2,7 @@ package myradio
 
 import (
 	"errors"
+	"net/url"
 	"time"
 
 	"github.com/UniversityRadioYork/myradio-go/api"
@@ -16,6 +17,12 @@ type User struct {
 	//@TODO: fix the api and make it return a photo object
 	Photo string
 	Bio   string
+}
+
+// UserSearch represents a MyRadio user search listing.
+type UserSearch struct {
+	MemberID     string
+	Fname, Sname string
 }
 
 // Officership represents an officership a user holds.
@@ -154,5 +161,12 @@ func (s *Session) CreateOrActivateUser(formParams map[string][]string) (user *Us
 // This consumes one API request.
 func (s *Session) GetColleges() (colleges []College, err error) {
 	err = s.get("/user/colleges").Into(&colleges)
+	return
+}
+
+// GetUserMeta retrieves all users matching a given search term.
+// This consumes one API request.
+func (s *Session) GetUserMeta(term string) (users []UserSearch, err error) {
+	err = s.getf("/user/findbyname/%s", url.QueryEscape(term)).Into(&users)
 	return
 }
