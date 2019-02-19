@@ -28,11 +28,12 @@ func (s *Session) Get(id int) (podcast *Podcast, err error) {
 
 // GetAllPodcasts retrieves the latest podcasts from MyRadio.
 // This consumes one API request.
-func (s *Session) GetAllPodcasts(numResults int, page int) (podcasts []Podcast, err error) {
+func (s *Session) GetAllPodcasts(numResults int, page int, includeSuspended bool) (podcasts []Podcast, err error) {
 
 	rq := api.NewRequest("/podcast/allpodcasts")
 	rq.Params["num_results"] = []string{strconv.Itoa(numResults)}
 	rq.Params["page"] = []string{strconv.Itoa(page)}
+	rq.Params["includeSuspended"] = []string{strconv.FormatBool(includeSuspended)}
 	rs := s.do(rq)
 
 	if err := rs.Into(&podcasts); err != nil {
