@@ -33,7 +33,11 @@ func (s *Session) GetAllPodcasts(numResults int, page int, includeSuspended bool
 	rq := api.NewRequest("/podcast/allpodcasts")
 	rq.Params["num_results"] = []string{strconv.Itoa(numResults)}
 	rq.Params["page"] = []string{strconv.Itoa(page)}
-	rq.Params["includeSuspended"] = []string{strconv.FormatBool(includeSuspended)}
+	suspended := "0"
+	if includeSuspended {
+		suspended = "1"
+	}
+	rq.Params["includeSuspended"] = []string{suspended}
 	rs := s.do(rq)
 
 	if err := rs.Into(&podcasts); err != nil {
