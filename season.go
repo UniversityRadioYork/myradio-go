@@ -13,9 +13,10 @@ type Season struct {
 	RequestedTime string `json:"requested_time"`
 	FirstTimeRaw  string `json:"first_time"`
 	FirstTime     time.Time
-	NumEpisodes   Link `json:"num_episodes"`
-	AllocateLink  Link `json:"allocatelink"`
-	RejectLink    Link `json:"rejectlink"`
+	NumEpisodes   Link              `json:"num_episodes"`
+	AllocateLink  Link              `json:"allocatelink"`
+	RejectLink    Link              `json:"rejectlink"`
+	Subtype       ShowSeasonSubtype `json:"subtype"`
 }
 
 // isScheduled returns whether the Season has been scheduled.
