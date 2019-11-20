@@ -15,17 +15,18 @@ type Credit struct {
 // A MyRadio show contains seasons, each containing timeslots.
 // @TODO: Refactor this to something better named
 type ShowMeta struct {
-	ShowID        int      `json:"show_id"`
-	Title         string   `json:"title"`
-	CreditsString string   `json:"credits_string"`
-	Credits       []Credit `json:"credits"`
-	Description   string   `json:"description"`
-	ShowTypeID    int      `json:"show_type_id"`
-	Season        Link     `json:"seasons"`
-	EditLink      Link     `json:"editlink"`
-	ApplyLink     Link     `json:"applylink"`
-	MicroSiteLink Link     `json:"micrositelink"`
-	Photo         string   `json:"photo"`
+	ShowID        int               `json:"show_id"`
+	Title         string            `json:"title"`
+	CreditsString string            `json:"credits_string"`
+	Credits       []Credit          `json:"credits"`
+	Description   string            `json:"description"`
+	ShowTypeID    int               `json:"show_type_id"`
+	Season        Link              `json:"seasons"`
+	EditLink      Link              `json:"editlink"`
+	ApplyLink     Link              `json:"applylink"`
+	MicroSiteLink Link              `json:"micrositelink"`
+	Photo         string            `json:"photo"`
+	Subtype       ShowSeasonSubtype `json:"subtype"`
 }
 
 // Link represents a MyRadio action link.
