@@ -2,6 +2,7 @@ package myradio
 
 import (
 	"fmt"
+	"github.com/UniversityRadioYork/myradio-go/api"
 	"strings"
 )
 
@@ -129,5 +130,55 @@ func (s *Session) GetTrackTitle(trackid uint64) (title string, err error) {
 // This consumes one API request.
 func (s *Session) GetTrackAlbum(trackid uint64) (album *Album, err error) {
 	err = s.getf("/track/%d/album", trackid).Into(&album)
+	return
+}
+
+// The parameters for searching for tracks.
+// All of these are optional.
+type TrackSearchParams struct {
+	Title    string
+	Artist   string
+	RecordID uint64
+	// The cleanliness of the track - either "y", "n", or "u"
+	Digitised bool
+	Clean     string
+	Precise   bool
+	Limit     uint64
+	// Either "id" (default), "title", or "random"
+	Sort             string
+	ITonesPlaylistID string
+}
+
+func (s *Session) SearchTracks(p TrackSearchParams) (tracks []Track, err error) {
+	args := make(map[string][]string)
+	if p.Title != "" {
+		args["title"] = []string{p.Title}
+	}
+	if p.Artist != "" {
+		args["artist"] = []string{p.Artist}
+	}
+	if p.RecordID != 0 {
+		args["recordid"] = []string{fmt.Sprint(p.RecordID)}
+	}
+	if p.Digitised != true {
+		args["digitised"] = []string{fmt.Sprint(p.Digitised)}
+	}
+	if p.Clean != "" {
+		args["clean"] = []string{p.Clean}
+	}
+	if p.Limit != 0 {
+		args["limit"] = []string{fmt.Sprint(p.Limit)}
+	}
+	if p.Sort != "" {
+		args["sort"] = []string{p.Sort}
+	}
+	if p.ITonesPlaylistID != "" {
+		args["itonesplaylistid"] = []string{p.ITonesPlaylistID}
+	}
+
+	req := api.NewRequest("/track/search")
+	req.Params = args
+	err = s.do(req).Into(&tracks)
+
 	return
 }
