@@ -15,6 +15,7 @@ func (s *Session) GetAllShowSubtypes() (subtypes []ShowSeasonSubtype, err error)
 }
 
 // GetShowSubtypeByClass returns a ShowSeasonSubtype based on a given class
+// Can return nil if no subtype found for given class
 func (s *Session) GetShowSubtypeByClass(class string) (subtype ShowSeasonSubtype, err error) {
 	subtypes, err := s.GetAllShowSubtypes()
 	if err != nil {
