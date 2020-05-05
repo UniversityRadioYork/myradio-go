@@ -15,8 +15,8 @@ func (s *Session) GetAllShowSubtypes() (subtypes []ShowSeasonSubtype, err error)
 }
 
 // GetShowSubtypeByClass returns a ShowSeasonSubtype based on a given class
-// Can return empty subtype if no subtype found for given class
-func (s *Session) GetShowSubtypeByClass(class string) (subtype ShowSeasonSubtype, err error) {
+// Can return nil pointer if no subtype found for given class
+func (s *Session) GetShowSubtypeByClass(class string) (subtype *ShowSeasonSubtype, err error) {
 	subtypes, err := s.GetAllShowSubtypes()
 	if err != nil {
 		return
@@ -24,7 +24,7 @@ func (s *Session) GetShowSubtypeByClass(class string) (subtype ShowSeasonSubtype
 
 	for _, subtype := range subtypes {
 		if subtype.Class == class {
-			return subtype, err
+			return &subtype, err
 		}
 	}
 	return
