@@ -37,7 +37,7 @@ func (s *Session) GetAllPodcasts(numResults int, page int, includeSuspended bool
 	if includeSuspended {
 		suspended = "1"
 	}
-	rq.Params["includeSuspended"] = []string{suspended}
+	rq.Params["include_suspended"] = []string{suspended}
 	rs := s.do(rq)
 
 	if err := rs.Into(&podcasts); err != nil {
