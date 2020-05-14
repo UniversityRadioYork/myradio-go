@@ -112,3 +112,8 @@ func (s *Session) GetCreditsToUsers(id int, isTimeslot bool) (creditsToUsers map
 
 	return
 }
+
+func (s *Session) GetPodcastRSS(id int) (result string, err error) {
+	err = s.getf("/show/%d/podcastrss", id).Into(&result)
+	return
+}
