@@ -37,7 +37,7 @@ func (s *Session) GetAllPodcasts(numResults int, page int, includeSuspended bool
 	if includeSuspended {
 		suspended = "1"
 	}
-	rq.Params["includeSuspended"] = []string{suspended}
+	rq.Params["include_suspended"] = []string{suspended}
 	rs := s.do(rq)
 
 	if err := rs.Into(&podcasts); err != nil {
@@ -45,4 +45,10 @@ func (s *Session) GetAllPodcasts(numResults int, page int, includeSuspended bool
 	}
 	return
 
+}
+
+// GetAllShowPodcasts returns all podcasts linked to the given show.
+func (s *Session) GetAllShowPodcasts(id int) (result []Podcast, err error) {
+	err = s.getf("/show/%d/allpodcasts", id).Into(&result)
+	return
 }
