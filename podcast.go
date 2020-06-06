@@ -17,12 +17,22 @@ type Podcast struct {
 	File          string `json:"uri"`
 	EditLink      Link   `json:"editlink"`
 	MicrositeLink Link   `json:"micrositelink"`
+	Show          *ShowMeta
 }
 
 // Get retrieves the data for a single podcast from MyRadio given it's ID.
 // This consumes one API request.
 func (s *Session) Get(id int) (podcast *Podcast, err error) {
 	err = s.getf("/podcast/%d", id).Into(&podcast)
+	return
+}
+
+// Get retrieves the data for a single podcast, and its associated show.
+// This only consumes one API request.
+func (s *Session) GetPodcastWithShow(id int) (podcast *Podcast, err error) {
+	req := api.NewRequestf("/podcast/%d", id)
+	req.Mixins = []string{"show"}
+	err = s.do(req).Into(&podcast)
 	return
 }
 
