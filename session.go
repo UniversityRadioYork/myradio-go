@@ -22,6 +22,15 @@ func NewSession(apikey string) (*Session, error) {
 	return &Session{requester: api.NewRequester(apikey, *url)}, nil
 }
 
+// NewSessionForServer constructs a new Session with the given API key for a non-standard server URL.
+func NewSessionForServer(apikey, server string) (*Session, error) {
+	url, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+	return &Session{requester: api.NewRequester(apikey, *url)}, nil
+}
+
 // MockSession creates a new mocked API session returning the JSON message stored in message.
 func MockSession(message []byte) (*Session, error) {
 	rm := json.RawMessage{}
@@ -75,3 +84,14 @@ func NewSessionFromKeyFile() (*Session, error) {
 
 	return NewSession(apikey)
 }
+
+// NewSessionFromKeyFileForServer tries to open a Session with the key from an API key file, with a non-standard server.
+func NewSessionFromKeyFileForServer(server string) (*Session, error) {
+	apikey, err := api.GetAPIKey()
+	if err != nil {
+		return nil, err
+	}
+
+	return NewSessionForServer(apikey, server)
+}
+
