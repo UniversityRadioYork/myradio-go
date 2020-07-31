@@ -14,8 +14,10 @@ type User struct {
 	Email        string `json:"public_email"`
 	Receiveemail bool   `json:"receive_email"`
 	//@TODO: fix the api and make it return a photo object
-	Photo string
-	Bio   string
+	Photo        string
+	Bio          string
+	RadioTimeRaw string `json:"radioTime"`
+	RadioTime    time.Duration
 }
 
 // Officership represents an officership a user holds.
@@ -57,6 +59,10 @@ func (s *Session) GetUser(id int) (user *User, err error) {
 	rq := api.NewRequestf("/user/%d", id)
 	rq.Mixins = []string{"personal_data"}
 	err = s.do(rq).Into(&user)
+	if err != nil {
+		return
+	}
+	err = user.PopulateRadioTime()
 	return
 }
 
@@ -154,5 +160,11 @@ func (s *Session) CreateOrActivateUser(formParams map[string][]string) (user *Us
 // This consumes one API request.
 func (s *Session) GetColleges() (colleges []College, err error) {
 	err = s.get("/user/colleges").Into(&colleges)
+	return
+}
+
+// PopulateRadioTime puts the raw string of radio time from API into time.Duration
+func (u *User) PopulateRadioTime() (err error) {
+	u.RadioTime, err = parseDuration(u.RadioTimeRaw)
 	return
 }
