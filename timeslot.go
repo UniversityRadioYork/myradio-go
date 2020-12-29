@@ -216,7 +216,9 @@ func (s *Session) GetCurrentTimeslot() (timeslot Timeslot, err error) {
 	if err = s.get("/timeslot/currenttimeslot").Into(&timeslot); err != nil {
 		return
 	}
-	err = timeslot.populateTimeslotTimes()
+	if timeslot.TimeslotID != 0 {
+		err = timeslot.populateTimeslotTimes()
+	}
 	return
 }
 
