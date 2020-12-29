@@ -211,6 +211,7 @@ func (s *Session) GetTimeslot(id int) (timeslot Timeslot, err error) {
 }
 
 // GetCurrentTimeslot retrieves the current timeslot.
+// If there is no show on air, returns the zero value for Timeslot.
 // This consumes one API request.
 func (s *Session) GetCurrentTimeslot() (timeslot Timeslot, err error) {
 	if err = s.get("/timeslot/currenttimeslot").Into(&timeslot); err != nil {
