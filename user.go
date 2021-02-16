@@ -13,6 +13,7 @@ type User struct {
 	Fname, Sname string
 	Email        string `json:"public_email"`
 	Receiveemail bool   `json:"receive_email"`
+	Eduroam      string `json:"eduroam,omitempty"`
 	//@TODO: fix the api and make it return a photo object
 	Photo        string
 	Bio          string
@@ -166,5 +167,12 @@ func (s *Session) GetColleges() (colleges []College, err error) {
 // PopulateRadioTime puts the raw string of radio time from API into time.Duration
 func (u *User) PopulateRadioTime() (err error) {
 	u.RadioTime, err = parseDuration(u.RadioTimeRaw)
+	return
+}
+
+func (s *Session) FindUserByEmail(email string) (user User, err error) {
+	rq := api.NewRequestf("/user/findbyemail/%s", email)
+	rq.Mixins = []string{"personal_data"}
+	err = s.do(rq).Into(&user)
 	return
 }
