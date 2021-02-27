@@ -131,3 +131,17 @@ func (s *Session) GetTrackAlbum(trackid uint64) (album *Album, err error) {
 	err = s.getf("/track/%d/album", trackid).Into(&album)
 	return
 }
+
+// GetTimeslotMetadata gets a metadata key for the timeslot.
+// Be careful.
+// Returns nil err and an empty string if the key does not exist, err if something went wrong.
+func (s *Session) GetTimeslotMetadata(timeslotId uint64, key string) (value string, err error) {
+	err = s.getf("/timeslot/%d/meta/%s", timeslotId, key).Into(&value)
+	if err != nil {
+		// a regex is too much, this works
+		if strings.Contains(err.Error(), "does not exist") {
+			err = nil
+		}
+	}
+	return
+}

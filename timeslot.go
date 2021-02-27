@@ -220,6 +220,18 @@ func (s *Session) GetCurrentTimeslot() (timeslot Timeslot, err error) {
 	return
 }
 
+// GetCurrentTimeslotAtTime retrieves the current timeslot.
+// This consumes one API request.
+func (s *Session) GetCurrentTimeslotAtTime(time int) (timeslot Timeslot, err error) {
+	paramMap := make(map[string][]string)
+	paramMap["time"] = []string{strconv.Itoa(time)}
+	if err = s.getWithQueryParams("/timeslot/currenttimeslot", paramMap).Into(&timeslot); err != nil {
+		return
+	}
+	err = timeslot.populateTimeslotTimes()
+	return
+}
+
 // GetTrackListForTimeslot retrieves the tracklist for the timeslot with the given ID.
 // This consumes one API request.
 func (s *Session) GetTrackListForTimeslot(id int) (tracklist []TracklistItem, err error) {
