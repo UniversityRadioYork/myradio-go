@@ -107,7 +107,7 @@ func TestGetSearchMetaUnmarshal(t *testing.T) {
 		Photo: "https://myradio.example.com/photos/shows/8675309",
 	}}
 
-	session := myradio.MockSession([]byte(getSearchMetaJson))
+	session := myradio.StaticMockSession([]byte(getSearchMetaJson))
 
 	showMeta, err := session.GetSearchMeta("tutone")
 	if err != nil {

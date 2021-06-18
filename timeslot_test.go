@@ -50,7 +50,7 @@ func TestGetWeekScheduleZero(t *testing.T) {
 
 	zeroes := [][]byte{[]byte("[]"), []byte("{}")}
 	for _, zero := range zeroes {
-		session := myradio.MockSession(zero)
+		session := myradio.StaticMockSession(zero)
 
 		schedule, err := session.GetWeekSchedule(0, 1)
 		if err != nil {

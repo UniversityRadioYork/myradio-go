@@ -79,7 +79,7 @@ func TestGetTeamHeadPositions(t *testing.T) {
 		},
 	}
 
-	session := myradio.MockSession([]byte(positionJSON))
+	session := myradio.StaticMockSession([]byte(positionJSON))
 
 	heads, err := session.GetTeamHeadPositions(1, nil)
 	if err != nil {
@@ -128,7 +128,7 @@ func TestGetTeamAssistantHeadPositions(t *testing.T) {
 		},
 	}
 
-	session := myradio.MockSession([]byte(positionJSON))
+	session := myradio.StaticMockSession([]byte(positionJSON))
 
 	heads, err := session.GetTeamAssistantHeadPositions(1, nil)
 	if err != nil {
