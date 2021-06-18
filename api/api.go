@@ -216,15 +216,19 @@ func (s *authedRequester) Do(r *Request) *Response {
 
 // mockRequester answers API requests by returning some stock response.
 type mockRequester struct {
-	message *json.RawMessage
+	messenger Messenger
 }
 
+type Messenger func(r *Request) []byte
+
 // MockRequester creates a new mocked requester.
-func MockRequester(message *json.RawMessage) Requester {
-	return &mockRequester{message: message}
+func MockRequester(messenger Messenger) Requester {
+	return &mockRequester{messenger: messenger}
 }
 
 // Do pretends to fulfil an API request, but actually returns the mockRequester's stock response.
 func (s *mockRequester) Do(r *Request) *Response {
-	return &Response{raw: s.message, err: nil}
+	rm := json.RawMessage{}
+	_ = rm.UnmarshalJSON(s.messenger(r))
+	return &Response{raw: &rm, err: nil}
 }
