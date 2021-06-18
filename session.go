@@ -32,13 +32,10 @@ func NewSessionForServer(apikey, server string) (*Session, error) {
 }
 
 // MockSession creates a new mocked API session returning the JSON message stored in message.
-func MockSession(message []byte) (*Session, error) {
+func MockSession(message []byte) *Session {
 	rm := json.RawMessage{}
-	err := rm.UnmarshalJSON(message)
-	if err != nil {
-		return nil, err
-	}
-	return &Session{requester: api.MockRequester(&rm)}, nil
+	_ = rm.UnmarshalJSON(message)
+	return &Session{requester: api.MockRequester(&rm)}
 }
 
 // do fulfils, a request for the given endpoint.
