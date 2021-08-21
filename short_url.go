@@ -3,7 +3,6 @@ package myradio
 import (
 	"bytes"
 	"net/url"
-	"strconv"
 )
 
 // ShortURL represents the key information of a short URL.
@@ -22,7 +21,7 @@ func (s *Session) LogShortURLClick(id uint, userAgent, ipAddress string) error {
 	params := url.Values{}
 	params["userAgent"] = []string{userAgent}
 	params["ipAddress"] = []string{ipAddress}
-	resp := s.putf("/shortUrl/%d/logclick", *bytes.NewBufferString(params.Encode()), strconv.Itoa(int(id)))
+	resp := s.putf("/shortUrl/%d/logclick", *bytes.NewBufferString(params.Encode()), id)
 	_, err := resp.JSON()
 	return err
 }
