@@ -2,7 +2,6 @@ package myradio
 
 import (
 	"bytes"
-	"encoding/json"
 	"net/url"
 
 	"github.com/UniversityRadioYork/myradio-go/api"
@@ -31,14 +30,17 @@ func NewSessionForServer(apikey, server string) (*Session, error) {
 	return &Session{requester: api.NewRequester(apikey, *url)}, nil
 }
 
-// MockSession creates a new mocked API session returning the JSON message stored in message.
-func MockSession(message []byte) (*Session, error) {
-	rm := json.RawMessage{}
-	err := rm.UnmarshalJSON(message)
-	if err != nil {
-		return nil, err
+// StaticMockSession creates a new mocked API session returning the JSON message stored in message.
+func StaticMockSession(message []byte) *Session {
+	messenger := func(_ *api.Request) []byte {
+		return message
 	}
-	return &Session{requester: api.MockRequester(&rm)}, nil
+	return &Session{requester: api.MockRequester(messenger)}
+}
+
+// MockSession creates a new mocked API session returning a JSON message defined by the messenger.
+func MockSession(messenger api.Messenger) *Session {
+	return &Session{requester: api.MockRequester(messenger)}
 }
 
 // do fulfils, a request for the given endpoint.
@@ -101,4 +103,3 @@ func NewSessionFromKeyFileForServer(server string) (*Session, error) {
 
 	return NewSessionForServer(apikey, server)
 }
-
