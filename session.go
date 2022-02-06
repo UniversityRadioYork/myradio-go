@@ -57,6 +57,13 @@ func (s *Session) getf(format string, params ...interface{}) *api.Response {
 	return s.do(api.NewRequestf(format, params...))
 }
 
+func (s *Session) getWithQueryParams(format string, queryParams map[string][]string) *api.Response {
+	r := api.NewRequest(format)
+	r.Params = queryParams
+	return s.do(r)
+
+}
+
 // putf creates, and fulfils, a PUT request for the endpoint created by
 // the given format string and parameters.
 func (s *Session) putf(format string, body bytes.Buffer, params ...interface{}) *api.Response {
