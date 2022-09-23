@@ -3,6 +3,8 @@ package myradio
 import (
 	"fmt"
 	"strings"
+
+	"github.com/UniversityRadioYork/myradio-go/api"
 )
 
 // Album contains information about an album in the URY track database.
@@ -144,4 +146,20 @@ func (s *Session) GetTimeslotMetadata(timeslotId uint64, key string) (value stri
 		}
 	}
 	return
+}
+
+// GetNowPlaying returns a Track struct of the currently playing track
+// allowOffAir is for if jukebox should be included even if it is off air
+// This consumes one API request
+func (s *Session) GetNowPlaying(allowOffAir bool) (Track, error) {
+	var response struct {
+		Track Track `json:"track"`
+	}
+
+	rq := api.NewRequest("/track/nowplaying")
+	rq.Params["allowOffAir"] = []string{strconv.FormatBool(allowOffAir)}
+	rs := s.do(rq)
+
+	err := rs.Into(&response)
+	return response.Track, err
 }
