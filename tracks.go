@@ -157,7 +157,7 @@ func (s *Session) GetNowPlaying(allowOffAir bool) (Track, error) {
 	}
 
 	rq := api.NewRequest("/track/nowplaying")
-	rq.Params["allowOffAir"] = []string{fmt.Sprintf("%v", allowOffAir)}
+	rq.Params["allowOffAir"] = []string{strconv.FormatBool(allowOffAir)}
 	rs := s.do(rq)
 
 	err := rs.Into(&response)
