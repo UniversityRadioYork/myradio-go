@@ -8,7 +8,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -52,7 +51,7 @@ func (m HTTPMethod) String() (string, error) {
 	case PutReq:
 		return "PUT", nil
 	default:
-		return "", errors.New("Invalid HTTP method specified")
+		return "", fmt.Errorf("invalid HTTP method specified: %q", m)
 	}
 }
 
@@ -135,6 +134,7 @@ type Requester interface {
 
 // authedRequester answers API requests by making an authed API call.
 type authedRequester struct {
+	client  http.Client
 	apikey  string
 	baseurl url.URL
 }
@@ -178,38 +178,38 @@ func (s *authedRequester) Do(r *Request) *Response {
 		theurl.RawQuery = encodedParams
 	}
 	req, err := http.NewRequest(reqMethod, theurl.String(), bytes.NewReader(r.Body.Bytes()))
+	if err != nil {
+		return &Response{err: fmt.Errorf("failed to build HTTP request: %w", err)}
+	}
 
 	// Specify content type for POST requests, as the body format has to be specified
 	if r.ReqType == PostReq {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded; param=value")
 	}
 
+	res, err := s.client.Do(req)
 	if err != nil {
-		return &Response{err: err}
-	}
-	client := &http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return &Response{err: err}
+		return &Response{err: fmt.Errorf("failed to perform HTTP request: %w", err)}
 	}
 	defer res.Body.Close()
 	data, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return &Response{err: err}
+		return &Response{err: fmt.Errorf("failed to read HTTP response: %w", err)}
 	}
-	if res.StatusCode != 200 {
-		return &Response{err: fmt.Errorf("%s Not ok: HTTP %d\n%s", r.Endpoint, res.StatusCode, string(data))}
-	}
+
+	// Even if the result is non-200 we still want to try to unmarshal the response, to have a more descriptive error
 	var response struct {
 		Status  string
 		Payload *json.RawMessage
 	}
 	err = json.Unmarshal(data, &response)
 	if err != nil {
-		return &Response{err: err}
+		return &Response{err: fmt.Errorf("failed to parse HTTP response: %w", err)}
 	}
 	if response.Status != "OK" {
-		return &Response{err: fmt.Errorf(r.Endpoint + fmt.Sprintf(" Response not OK: %v", response))}
+		var payloadStr string
+		_ = json.Unmarshal(*response.Payload, &payloadStr)
+		return &Response{err: Error{Endpoint: r.Endpoint, Code: res.StatusCode, Payload: payloadStr}}
 	}
 	return &Response{raw: response.Payload, err: nil}
 }
