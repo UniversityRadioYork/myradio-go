@@ -2,6 +2,8 @@ package myradio
 
 import (
 	"errors"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/UniversityRadioYork/myradio-go/api"
@@ -49,6 +51,39 @@ type UserAlias struct {
 type College struct {
 	CollegeId   int    `json:"value,string"`
 	CollegeName string `json:"text"`
+}
+
+// GetThisYearsMembers retrieves all the users.
+// This consumes one API request.
+func (s *Session) GetThisYearsMembers() (users []User, err error) {
+	var preProcessedUsers []struct {
+		Name     string `json:"name"`
+		MemberID string `json:"memberid"`
+		Email    string `json:"email"`
+	}
+
+	rq := api.NewRequest("/profile/thisyearsmembers")
+	err = s.do(rq).Into(&preProcessedUsers)
+	if err != nil {
+		return
+	}
+
+	for _, user := range preProcessedUsers {
+		splitName := strings.Split(user.Name, ", ")
+		memberID, err := strconv.Atoi(user.MemberID)
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, User{
+			Fname:    splitName[1],
+			Sname:    splitName[0],
+			Email:    user.Email,
+			MemberID: memberID,
+		})
+	}
+
+	return
 }
 
 // GetUser retrieves the User with the given ID.
