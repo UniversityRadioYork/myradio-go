@@ -2,12 +2,15 @@ package myradio
 
 import (
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/UniversityRadioYork/myradio-go/api"
 )
+
+const BaseEmailDomain = "@york.ac.uk"
 
 // User represents a MyRadio user.
 type User struct {
@@ -60,6 +63,7 @@ func (s *Session) GetThisYearsMembers() (users []User, err error) {
 		Name     string `json:"name"`
 		MemberID string `json:"memberid"`
 		Email    string `json:"email"`
+		Eduroam  string `json:"eduroam"`
 	}
 
 	rq := api.NewRequest("/profile/thisyearsmembers")
@@ -73,6 +77,10 @@ func (s *Session) GetThisYearsMembers() (users []User, err error) {
 		memberID, err := strconv.Atoi(user.MemberID)
 		if err != nil {
 			return nil, err
+		}
+
+		if user.Email == "" {
+			user.Email = fmt.Sprintf("%s%s", user.Eduroam, BaseEmailDomain)
 		}
 
 		users = append(users, User{
