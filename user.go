@@ -199,3 +199,26 @@ func (s *Session) GetColleges() (colleges []College, err error) {
 	err = s.get("/user/colleges").Into(&colleges)
 	return
 }
+
+// UserCredentialsTest takes a username and password and checks it against myradio
+// If it's valid, it returns the user pointer
+// If it's invalid login, it returns nil pointer, but also no error
+// This consumes one API request.
+func (s *Session) UserCredentialsTest(username string, password string) (*User, error) {
+	var response interface{}
+	rs := s.post("/auth/testcredentials", map[string][]string{"user": {username}, "pass": {password}})
+	if err := rs.Into(&response); err != nil {
+		return nil, err
+	}
+
+	switch response.(type) {
+	case bool:
+		// not valid credentials
+		return nil, nil
+	case map[string]interface{}:
+		var user User
+		rs.Into(&user)
+		return &user, nil
+	}
+	return nil, fmt.Errorf("wrong type")
+}
