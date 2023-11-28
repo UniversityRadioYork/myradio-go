@@ -21,6 +21,7 @@ type User struct {
 	//@TODO: fix the api and make it return a photo object
 	Photo string
 	Bio   string
+	Eduroam	string
 }
 
 // Officership represents an officership a user holds.
@@ -88,6 +89,7 @@ func (s *Session) GetThisYearsMembers() (users []User, err error) {
 			Sname:    splitName[0],
 			Email:    user.Email,
 			MemberID: memberID,
+			Eduroam:  user.Eduroam,
 		})
 	}
 
