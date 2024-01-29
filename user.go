@@ -2,10 +2,15 @@ package myradio
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/UniversityRadioYork/myradio-go/api"
 )
+
+const BaseEmailDomain = "@york.ac.uk"
 
 // User represents a MyRadio user.
 type User struct {
@@ -16,6 +21,7 @@ type User struct {
 	//@TODO: fix the api and make it return a photo object
 	Photo string
 	Bio   string
+	Eduroam	string
 }
 
 // Officership represents an officership a user holds.
@@ -49,6 +55,45 @@ type UserAlias struct {
 type College struct {
 	CollegeId   int    `json:"value,string"`
 	CollegeName string `json:"text"`
+}
+
+// GetThisYearsMembers retrieves all the users.
+// This consumes one API request.
+func (s *Session) GetThisYearsMembers() (users []User, err error) {
+	var preProcessedUsers []struct {
+		Name     string `json:"name"`
+		MemberID string `json:"memberid"`
+		Email    string `json:"email"`
+		Eduroam  string `json:"eduroam"`
+	}
+
+	rq := api.NewRequest("/profile/thisyearsmembers")
+	err = s.do(rq).Into(&preProcessedUsers)
+	if err != nil {
+		return
+	}
+
+	for _, user := range preProcessedUsers {
+		splitName := strings.Split(user.Name, ", ")
+		memberID, err := strconv.Atoi(user.MemberID)
+		if err != nil {
+			return nil, err
+		}
+
+		if user.Email == "" {
+			user.Email = fmt.Sprintf("%s%s", user.Eduroam, BaseEmailDomain)
+		}
+
+		users = append(users, User{
+			Fname:    splitName[1],
+			Sname:    splitName[0],
+			Email:    user.Email,
+			MemberID: memberID,
+			Eduroam:  user.Eduroam,
+		})
+	}
+
+	return
 }
 
 // GetUser retrieves the User with the given ID.
@@ -155,4 +200,27 @@ func (s *Session) CreateOrActivateUser(formParams map[string][]string) (user *Us
 func (s *Session) GetColleges() (colleges []College, err error) {
 	err = s.get("/user/colleges").Into(&colleges)
 	return
+}
+
+// UserCredentialsTest takes a username and password and checks it against myradio
+// If it's valid, it returns the user pointer
+// If it's invalid login, it returns nil pointer, but also no error
+// This consumes one API request.
+func (s *Session) UserCredentialsTest(username string, password string) (*User, error) {
+	var response interface{}
+	rs := s.post("/auth/testcredentials", map[string][]string{"user": {username}, "pass": {password}})
+	if err := rs.Into(&response); err != nil {
+		return nil, err
+	}
+
+	switch response.(type) {
+	case bool:
+		// not valid credentials
+		return nil, nil
+	case map[string]interface{}:
+		var user User
+		rs.Into(&user)
+		return &user, nil
+	}
+	return nil, fmt.Errorf("wrong type")
 }
