@@ -1,17 +1,13 @@
 package myradio
 
 import (
-	"errors"
-	"fmt"
 	"time"
-
-	"github.com/UniversityRadioYork/myradio-go/api"
 )
 
 // Term represents information about a MyRadio scheduling term
 type Term struct {
 	TermID int `json:"term_id"`
-	Start int `json:"start"`
+	Start int64 `json:"start"`
 	Description string `json:"descr"`
 	NumWeeks int `json:"num_weeks"`
 	WeekNames []string `json:"week_names"`
