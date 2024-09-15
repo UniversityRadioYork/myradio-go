@@ -134,7 +134,7 @@ type Requester interface {
 
 // authedRequester answers API requests by making an authed API call.
 type authedRequester struct {
-	client  http.Client
+	client  *http.Client
 	apikey  string
 	baseurl url.URL
 }
@@ -142,6 +142,7 @@ type authedRequester struct {
 // NewRequester creates a new 'live' requester.
 func NewRequester(apikey string, url url.URL) Requester {
 	return &authedRequester{
+		client:  http.DefaultClient,
 		apikey:  apikey,
 		baseurl: url,
 	}
