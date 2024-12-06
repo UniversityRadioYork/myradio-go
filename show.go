@@ -1,9 +1,5 @@
 package myradio
 
-import (
-	"net/url"
-)
-
 // Credit represents a show credit associating a user with a show.
 type Credit struct {
 	Type     int  `json:"type"`
@@ -40,7 +36,7 @@ type Link struct {
 // GetSearchMeta retrieves all shows whose metadata matches a given search term.
 // This consumes one API request.
 func (s *Session) GetSearchMeta(term string) (shows []ShowMeta, err error) {
-	err = s.getf("/show/searchmeta/%s", url.QueryEscape(term)).Into(&shows)
+	err = s.getf("/show/searchmeta/%s", term).Into(&shows)
 	return
 }
 
