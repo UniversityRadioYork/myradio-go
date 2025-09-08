@@ -101,4 +101,3 @@ func NewSessionFromKeyFileForServer(server string) (*Session, error) {
 
 	return NewSessionForServer(apikey, server)
 }
-

@@ -7,9 +7,11 @@ import (
 )
 
 type TrainingSession struct {
-	StartTimeRaw string `json:"demo_time"`
-	Host         string `json:"member"`
-	HostMemberID int    `json:"memberid"`
+	DemoID            string `json:"demo_id"`
+	PresenterStatusID string `json:"presenterstatusid"`
+	StartTimeRaw      string `json:"demo_time"`
+	Host              string `json:"member"`
+	HostMemberID      int    `json:"memberid"`
 }
 
 func (ts *TrainingSession) StartTime() time.Time {
