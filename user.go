@@ -27,6 +27,7 @@ type Officership struct {
 	FromDate    time.Time
 	TillDateRaw string `json:"till_date,omitempty"`
 	TillDate    time.Time
+	Officer     OfficerPosition `json:"officer"`
 }
 
 // Photo represents a photo of a user.
@@ -49,6 +50,11 @@ type UserAlias struct {
 type College struct {
 	CollegeId   int    `json:"value,string"`
 	CollegeName string `json:"text"`
+}
+
+type Training struct {
+	StatusID int    `json:"status_id"`
+	Title    string `json:"title"`
 }
 
 // GetUser retrieves the User with the given ID.
@@ -154,5 +160,10 @@ func (s *Session) CreateOrActivateUser(formParams map[string][]string) (user *Us
 // This consumes one API request.
 func (s *Session) GetColleges() (colleges []College, err error) {
 	err = s.get("/user/colleges").Into(&colleges)
+	return
+}
+
+func (s *Session) GetUserTraining(userID int) (trainings []Training, err error) {
+	err = s.getf("/user/%d/alltraining", userID).Into(&trainings)
 	return
 }
