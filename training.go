@@ -14,6 +14,13 @@ type TrainingSession struct {
 	HostMemberID      int    `json:"memberid"`
 }
 
+type TrainingSessionForSignup struct {
+	TrainingSession
+	SignupCutoffHours int `json:"signup_cutoff_hours"`
+	MaxParticipants int `json:"max_participants"`
+	AttendeeCount int `json:"attendee_count"`
+}
+
 func (ts *TrainingSession) StartTime() time.Time {
 	t, _ := time.Parse("Mon 02 Jan 15:04", ts.StartTimeRaw)
 
@@ -24,5 +31,11 @@ func (s *Session) GetFutureTrainingSessions() (sessions []TrainingSession, err e
 	rq := api.NewRequestf("/demo/listdemos")
 	err = s.do(rq).Into(&sessions)
 
+	return
+}
+
+func (s *Session) GetFutureTrainingSessionsForSignup() (sessions []TrainingSessionForSignup, err error) {
+	rq := api.NewRequestf("/demo/listdemosforsignup")
+	err = s.do(rq).Into(&sessions)
 	return
 }
