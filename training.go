@@ -45,7 +45,7 @@ func (s *Session) GetFutureTrainingSessionsForSignup() (sessions []TrainingSessi
 func (s *Session) AddAttendeeToDemo(demoID int, userID int) (result int, err error) {
 	formParams := make(map[string][]string)
 	formParams["userid"] = []string{strconv.Itoa(userID)}
-	rs := s.post(fmt.Sprintf("/demo/addattendee", demoID), formParams)
+	rs := s.post(fmt.Sprintf("/demo/%d/addattendee", demoID), formParams)
 	err = rs.Into(&result)
 	return
 }
