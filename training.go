@@ -49,3 +49,12 @@ func (s *Session) AddAttendeeToDemo(demoID int, userID int) (result int, err err
 	err = rs.Into(&result)
 	return
 }
+
+func (s *Session) AddToWaitingList(presenterStatusID int, userID int) (result int, err error) {
+	formParams := make(map[string][]string)
+	formParams["presenterstatusid"] = []string{strconv.Itoa(presenterStatusID)}
+	formParams["userid"] = []string{strconv.Itoa(userID)}
+	rs := s.post("/demo/addtowaitinglist", formParams)
+	err = rs.Into(&result)
+	return
+}
