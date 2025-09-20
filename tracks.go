@@ -2,8 +2,8 @@ package myradio
 
 import (
 	"fmt"
-	"strings"
 	"strconv"
+	"strings"
 
 	"github.com/UniversityRadioYork/myradio-go/api"
 )
